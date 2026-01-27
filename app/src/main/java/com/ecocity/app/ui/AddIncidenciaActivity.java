@@ -17,7 +17,9 @@ public class AddIncidenciaActivity extends AppCompatActivity {
 
     private TextInputEditText etTitulo, etDescripcion;
     private Spinner spinnerUrgencia;
+    private Button btnSave;
     private Button btnDelete;
+    private IncidenciaDAO incidenciaDAO;
     private Incidencia incidenciaToEdit;
 
     @Override

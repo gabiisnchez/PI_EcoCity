@@ -17,8 +17,8 @@ public class AddIncidenciaActivity extends AppCompatActivity {
 
     private TextInputEditText etTitulo, etDescripcion;
     private Spinner spinnerUrgencia;
-    private Button btnSave;
-    private IncidenciaDAO incidenciaDAO;
+    private Button btnDelete;
+    private Incidencia incidenciaToEdit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,11 +29,18 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         etDescripcion = findViewById(R.id.etDescripcion);
         spinnerUrgencia = findViewById(R.id.spinnerUrgencia);
         btnSave = findViewById(R.id.btnSave);
+        btnDelete = findViewById(R.id.btnDelete);
 
         incidenciaDAO = new IncidenciaDAO(this);
         incidenciaDAO.open();
 
         setupSpinner();
+
+        // Check for Intent extras
+        if (getIntent().hasExtra("incidencia")) {
+            incidenciaToEdit = (Incidencia) getIntent().getSerializableExtra("incidencia");
+            setupEditMode();
+        }
 
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -41,13 +48,45 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                 saveIncidencia();
             }
         });
+
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteIncidencia();
+            }
+        });
     }
 
     private void setupSpinner() {
-        String[] urgencias = {"Baja", "Media", "Alta"};
+        String[] urgencias = { "Baja", "Media", "Alta" };
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, urgencias);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerUrgencia.setAdapter(adapter);
+    }
+
+    private void setupEditMode() {
+        if (incidenciaToEdit != null) {
+            etTitulo.setText(incidenciaToEdit.getTitulo());
+            etDescripcion.setText(incidenciaToEdit.getDescripcion());
+
+            // Set spinner selection
+            ArrayAdapter<String> adapter = (ArrayAdapter<String>) spinnerUrgencia.getAdapter();
+            int position = adapter.getPosition(incidenciaToEdit.getUrgencia());
+            if (position >= 0) {
+                spinnerUrgencia.setSelection(position);
+            }
+
+            btnSave.setText("Actualizar");
+            btnDelete.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void deleteIncidencia() {
+        if (incidenciaToEdit != null) {
+            incidenciaDAO.deleteIncidencia(incidenciaToEdit.getId());
+            Toast.makeText(this, "Incidencia eliminada", Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
     private void saveIncidencia() {
@@ -60,15 +99,30 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             return;
         }
 
-        // For Hito 1, photo and location are dummy values
-        Incidencia incidencia = new Incidencia(titulo, descripcion, urgencia, "", 0.0, 0.0);
-        long result = incidenciaDAO.insertIncidencia(incidencia);
+        if (incidenciaToEdit != null) {
+            // Update existing
+            incidenciaToEdit.setTitulo(titulo);
+            incidenciaToEdit.setDescripcion(descripcion);
+            incidenciaToEdit.setUrgencia(urgencia);
 
-        if (result != -1) {
-            Toast.makeText(this, R.string.msg_saved, Toast.LENGTH_SHORT).show();
-            finish(); // Return to list
+            int result = incidenciaDAO.updateIncidencia(incidenciaToEdit);
+            if (result > 0) {
+                Toast.makeText(this, "Actualizado correctamente", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(this, "Error al actualizar", Toast.LENGTH_SHORT).show();
+            }
         } else {
-            Toast.makeText(this, "Error al guardar", Toast.LENGTH_SHORT).show();
+            // Create new
+            Incidencia incidencia = new Incidencia(titulo, descripcion, urgencia, "", 0.0, 0.0);
+            long result = incidenciaDAO.insertIncidencia(incidencia);
+
+            if (result != -1) {
+                Toast.makeText(this, R.string.msg_saved, Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(this, "Error al guardar", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

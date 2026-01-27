@@ -38,6 +38,27 @@ public class IncidenciaDAO {
         return database.insert(DbHelper.TABLE_INCIDENCIAS, null, values);
     }
 
+    public int updateIncidencia(Incidencia incidencia) {
+        ContentValues values = new ContentValues();
+        values.put(DbHelper.COLUMN_TITULO, incidencia.getTitulo());
+        values.put(DbHelper.COLUMN_DESCRIPCION, incidencia.getDescripcion());
+        values.put(DbHelper.COLUMN_URGENCIA, incidencia.getUrgencia());
+        values.put(DbHelper.COLUMN_FOTOPATH, incidencia.getFotoPath());
+        values.put(DbHelper.COLUMN_ESTADO, incidencia.getEstado());
+        values.put(DbHelper.COLUMN_LATITUD, incidencia.getLatitud());
+        values.put(DbHelper.COLUMN_LONGITUD, incidencia.getLongitud());
+
+        return database.update(DbHelper.TABLE_INCIDENCIAS, values,
+                DbHelper.COLUMN_ID + " = ?",
+                new String[] { String.valueOf(incidencia.getId()) });
+    }
+
+    public void deleteIncidencia(int id) {
+        database.delete(DbHelper.TABLE_INCIDENCIAS,
+                DbHelper.COLUMN_ID + " = ?",
+                new String[] { String.valueOf(id) });
+    }
+
     public List<Incidencia> getAllIncidencias() {
         List<Incidencia> incidencias = new ArrayList<>();
         Cursor cursor = database.query(DbHelper.TABLE_INCIDENCIAS,

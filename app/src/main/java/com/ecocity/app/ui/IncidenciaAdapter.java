@@ -50,8 +50,18 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<IncidenciaAdapter.In
         }
 
         holder.statusBar.setBackgroundColor(urgencyColor);
-        holder.chipUrgencia.setCardBackgroundColor(Color.parseColor("#F5F5F5")); 
+        holder.chipUrgencia.setCardBackgroundColor(Color.parseColor("#F5F5F5"));
         holder.tvUrgencia.setTextColor(urgencyColor);
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                android.content.Context context = v.getContext();
+                android.content.Intent intent = new android.content.Intent(context, AddIncidenciaActivity.class);
+                intent.putExtra("incidencia", incidencia);
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override

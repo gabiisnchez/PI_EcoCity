@@ -17,6 +17,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
 
     private TextInputEditText etTitulo, etDescripcion;
     private Spinner spinnerUrgencia;
+    private android.widget.TextView tvLocationStatusDetail;
     private Button btnSave;
     private Button btnDelete;
     private IncidenciaDAO incidenciaDAO;
@@ -30,6 +31,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         etTitulo = findViewById(R.id.etTitulo);
         etDescripcion = findViewById(R.id.etDescripcion);
         spinnerUrgencia = findViewById(R.id.spinnerUrgencia);
+        tvLocationStatusDetail = findViewById(R.id.tvLocationStatusDetail);
         btnSave = findViewById(R.id.btnSave);
         btnDelete = findViewById(R.id.btnDelete);
 
@@ -42,6 +44,9 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         if (getIntent().hasExtra("incidencia")) {
             incidenciaToEdit = (Incidencia) getIntent().getSerializableExtra("incidencia");
             setupEditMode();
+        } else {
+            // Default for new incidence
+            tvLocationStatusDetail.setText("Pendiente (Se podrá añadir tras guardar)");
         }
 
         btnSave.setOnClickListener(new View.OnClickListener() {
@@ -76,6 +81,15 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             int position = adapter.getPosition(incidenciaToEdit.getUrgencia());
             if (position >= 0) {
                 spinnerUrgencia.setSelection(position);
+            }
+
+            // Location Status
+            if (incidenciaToEdit.getLatitud() != 0.0 || incidenciaToEdit.getLongitud() != 0.0) {
+                tvLocationStatusDetail.setText("Ubicación Registrada");
+                tvLocationStatusDetail.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+            } else {
+                tvLocationStatusDetail.setText("Pendiente (Toca para añadir)");
+                // Here we would enable the button theoretically
             }
 
             btnSave.setText("Actualizar");

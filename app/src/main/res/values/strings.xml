@@ -11,4 +11,8 @@
     <string name="msg_empty_fields">Por favor complete todos los campos</string>
     <string name="msg_saved">Incidencia guardada correctamente</string>
     <string name="subtitle_incidencia">INCIDENCIAS</string>
+    <string name="add_ubi">Añadir Ubicación</string>
+    <string name="waiting_ubi">Pendiente (Se podrá añadir tras guardar)</string>
+    <string name="ubi">Ubicación</string>
+    <string name="btn_delete">Eliminar</string>
 </resources>

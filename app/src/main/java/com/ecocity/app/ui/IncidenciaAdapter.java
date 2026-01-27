@@ -53,6 +53,17 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<IncidenciaAdapter.In
         holder.chipUrgencia.setCardBackgroundColor(Color.parseColor("#F5F5F5"));
         holder.tvUrgencia.setTextColor(urgencyColor);
 
+        // Location Status Logic
+        if (incidencia.getLatitud() != 0.0 || incidencia.getLongitud() != 0.0) {
+            holder.tvLocationStatus.setText("Ubicación registrada");
+            holder.tvLocationStatus.setTextColor(Color.parseColor("#2E7D32")); // Green
+            holder.ivLocationIcon.setColorFilter(Color.parseColor("#2E7D32"));
+        } else {
+            holder.tvLocationStatus.setText("Ubicación pendiente");
+            holder.tvLocationStatus.setTextColor(Color.parseColor("#FF9800")); // Orange warning
+            holder.ivLocationIcon.setColorFilter(Color.parseColor("#FF9800"));
+        }
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,9 +81,10 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<IncidenciaAdapter.In
     }
 
     public static class IncidenciaViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTitulo, tvDescripcion, tvUrgencia, tvEstado;
+        TextView tvTitulo, tvDescripcion, tvUrgencia, tvEstado, tvLocationStatus;
         View statusBar;
         CardView chipUrgencia;
+        android.widget.ImageView ivLocationIcon;
 
         public IncidenciaViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -82,6 +94,8 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<IncidenciaAdapter.In
             tvEstado = itemView.findViewById(R.id.tvEstado);
             statusBar = itemView.findViewById(R.id.statusBar);
             chipUrgencia = itemView.findViewById(R.id.chipUrgencia);
+            tvLocationStatus = itemView.findViewById(R.id.tvLocationStatus);
+            ivLocationIcon = itemView.findViewById(R.id.ivLocationIcon);
         }
     }
 }

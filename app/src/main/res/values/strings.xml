@@ -10,4 +10,5 @@
     <string name="title_activity_add_incidencia">Nueva Incidencia</string>
     <string name="msg_empty_fields">Por favor complete todos los campos</string>
     <string name="msg_saved">Incidencia guardada correctamente</string>
+    <string name="subtitle_incidencia">INCIDENCIAS</string>
 </resources>

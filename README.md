@@ -1,23 +1,63 @@
-# EcoCity - Ciudad Inteligente
+# 🌱 EcoCity – Ciudad Inteligente
 
-**EcoCity** es una aplicación móvil Android nativa diseñada para empoderar a los ciudadanos en la gestión de incidencias urbanas. Este proyecto forma parte de la iniciativa "Ciudad Inteligente" del Ayuntamiento, ofreciendo una solución híbrida que combina la robustez de los sistemas locales con la versatilidad de la nube.
+**EcoCity** es una aplicación móvil **Android nativa** diseñada para empoderar a la ciudadanía en la gestión de incidencias urbanas 🏙️. Forma parte de la iniciativa **"Ciudad Inteligente"** del Ayuntamiento, combinando la robustez de los sistemas locales con la flexibilidad de la nube ☁️.
 
-## 1. Contexto del Proyecto
+---
 
-El objetivo principal es permitir a los usuarios reportar incidencias (baches, farolas rotas, basura, etc.) en tiempo real. La arquitectura del sistema está diseñada para ser resiliente, soportando operaciones sin conexión a internet y sincronización automática cuando la red está disponible.
+## 📌 Índice
 
-## 2. Descripción Funcional General
+* 🚀 [Contexto del Proyecto](#-contexto-del-proyecto)
+* ⚙️ [Descripción Funcional General](#️-descripción-funcional-general)
+* 🗂️ [Estructura del Proyecto](#️-estructura-del-proyecto)
+* ✅ [Estado del Proyecto – Hito 1](#-estado-del-proyecto--hito-1)
+* 🔮 [Próximos Pasos](#-próximos-pasos)
 
-La aplicación ofrecerá las siguientes funcionalidades principales:
+---
 
-*   **Gestión de Identidad**: Registro e inicio de sesión seguro.
-*   **Reporte de Incidencias**: Creación de alertas con título, descripción, nivel de urgencia, evidencia multimedia (foto/audio) y ubicación GPS.
-*   **Sincronización Inteligente**: Operatividad offline con sincronización diferida (Offline-First).
-*   **Soporte Técnico**: Canal de comunicación directo vía TCP/IP (Sockets).
+## 🚀 Contexto del Proyecto
 
-### Estructura del Proyecto
+El objetivo principal de **EcoCity** es permitir a los usuarios **reportar incidencias urbanas en tiempo real** como:
 
-El proyecto sigue una organización de carpetas basada en la arquitectura **MVC**, separando claramente las responsabilidades:
+* 🕳️ Baches
+* 💡 Farolas rotas
+* 🗑️ Acumulación de basura
+* 🚧 Otros problemas urbanos
+
+La aplicación está diseñada bajo una arquitectura **resiliente y Offline-First**, permitiendo su uso **sin conexión a internet** y sincronizando automáticamente cuando la red está disponible 📶.
+
+---
+
+## ⚙️ Descripción Funcional General
+
+La aplicación ofrece las siguientes funcionalidades clave:
+
+### 🔐 Gestión de Identidad
+
+* Registro e inicio de sesión seguro de usuarios.
+
+### 📝 Reporte de Incidencias
+
+* Creación de alertas con:
+
+  * 🏷️ Título
+  * 📄 Descripción
+  * 🚨 Nivel de urgencia
+  * 📷 Evidencia multimedia (foto / audio)
+  * 📍 Ubicación GPS
+
+### 🔄 Sincronización Inteligente
+
+* Funcionamiento **offline** con sincronización diferida automática.
+
+### 🛠️ Soporte Técnico
+
+* Canal de comunicación directa mediante **Sockets TCP/IP**.
+
+---
+
+## 🗂️ Estructura del Proyecto
+
+El proyecto sigue el patrón de arquitectura **MVC (Model–View–Controller)**, separando claramente responsabilidades:
 
 ```text
 EcoCity/
@@ -25,21 +65,21 @@ EcoCity/
 │   ├── src/
 │   │   ├── main/
 │   │       ├── java/com/ecocity/
-│   │       │   ├── controller/      # Lógica de negocio y comunicación
+│   │       │   ├── controller/                        # Lógica de negocio y comunicación
 │   │       │   │   ├── LoginController.java
 │   │       │   │   └── IncidentController.java
-│   │       │   ├── model/           # Datos y Base de Datos (SQLite)
+│   │       │   ├── model/                             # Datos y Base de Datos (SQLite)
 │   │       │   │   ├── Incident.java
 │   │       │   │   ├── User.java
 │   │       │   │   └── DatabaseHelper.java
-│   │       │   ├── view/            # Interfaz de Usuario (Activities)
+│   │       │   ├── view/                              # Interfaz de Usuario (Activities)
 │   │       │   │   ├── LoginActivity.java
 │   │       │   │   ├── IncidentListActivity.java
 │   │       │   │   ├── CreateIncidentActivity.java
-│   │       │   │   └── adapter/     # Adaptadores para RecyclerView
+│   │       │   │   └── adapter/                       # Adaptadores para RecyclerView
 │   │       │   │       └── IncidentAdapter.java
 │   │       ├── res/
-│   │           ├── layout/          # Diseños XML
+│   │           ├── layout/                            # Diseños XML
 │   │           └── values/
 ├── build.gradle
 └── README.md
@@ -47,29 +87,80 @@ EcoCity/
 
 ---
 
-## 3. Estado del Proyecto: Hito 1 Completado
+## ✅ Estado del Proyecto – Hito 1
 
-Actualmente, el proyecto ha completado el **Hito 1**, centrado en la experiencia de usuario esencial y la persistencia de datos local.
+🎯 **Hito 1 completado con éxito**. Este primer hito se ha centrado en la **experiencia de usuario** y la **persistencia local de datos**.
 
-### 📅 Hito 1: Experiencia de Usuario y Persistencia Local
+### 🎨 Interfaz de Usuario (UI/UX)
 
-**Objetivo**: Establecer la estructura visual de la aplicación y garantizar su funcionamiento sin conexión a internet mediante base de datos local.
+* 🔑 **Pantalla de Login**
 
-#### Funcionalidades Implementadas
+  * Diseño visual limpio
+  * Validación de credenciales
 
-**1. Interfaz de Usuario (UI/UX)**
-*   **Pantalla de Login**: Diseño visual y validación de credenciales.
-*   **Listado de Incidencias**: Visualización mediante `RecyclerView` con tarjetas personalizadas para cada reporte.
-*   **Formulario de Alta**: Pantalla para crear nuevas incidencias con validaciones de entrada de datos.
+* 📋 **Listado de Incidencias**
 
-**2. Datos Locales (Persistencia)**
-*   **Base de Datos**: Implementación de SQLite para el almacenamiento local.
-*   **CRUD Completo**:
-    *   **Crear**: Registrar nuevas incidencias en el dispositivo.
-    *   **Leer**: Consultar el listado de incidencias guardadas.
-    *   **Editar**: Modificar datos de una incidencia existente.
-    *   **Borrar**: Eliminar incidencias de la base de datos local.
+  * Uso de `RecyclerView`
+  * Tarjetas personalizadas por incidencia
 
-> **Próximos Pasos (Hitos Futuros)**
-> *   *Hito 2: Integración de características multimedia (Cámara) y sensores (GPS).*
-> *   *Hito 3: Sincronización con la nube (Firebase) e implementación de Sockets TCP.*
+* ➕ **Formulario de Alta**
+
+  * Creación de nuevas incidencias
+  * Validación de entradas de usuario
+
+### 💾 Persistencia de Datos (Offline)
+
+* 🗄️ Base de datos **SQLite** integrada
+* 🔄 **CRUD completo**:
+
+  * ➕ Crear incidencias
+  * 👀 Leer incidencias almacenadas
+  * ✏️ Editar incidencias existentes
+  * 🗑️ Eliminar incidencias
+
+---
+
+## 🔮 Próximos Pasos
+
+📍 **Roadmap del proyecto**:
+
+* 🧭 **Hito 2**: Integración de multimedia (📷 Cámara, 🎤 Audio) y sensores (📍 GPS).
+* ☁️ **Hito 3**: Sincronización con la nube (Firebase) y comunicación mediante **Sockets TCP**.
+
+---
+
+## 👥 Autores
+
+### Alejandro Martínez Bou
+
+[![GitHub](https://img.shields.io/badge/GitHub-AlejandroBou-181717?style=for-the-badge&logo=github)](https://github.com/AlejandroBou)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Alejandro_Martínez_Bou-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/alejandro-mart%C3%ADnez-bou-3666a6349/)
+
+### Gabriel Sánchez Heredia
+
+[![GitHub](https://img.shields.io/badge/GitHub-gabiisnchez-181717?style=for-the-badge&logo=github)](https://github.com/gabiisnchez)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Gabriel_Sánchez_Heredia-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/gabrielsanher/)
+
+
+
+## 📧 Contacto
+
+Para preguntas o sugerencias sobre el proyecto:
+
+- 📫 Abre un issue en el repositorio
+- 💬 Inicia una discusión en la pestaña Discussions
+- ⭐ Da una estrella si te ha sido útil
+
+---
+
+<div align="center">
+
+⭐ **¡No olvides dar una estrella al proyecto si te ha sido útil!** ⭐
+
+💚 *EcoCity – Construyendo ciudades más inteligentes y sostenibles.*
+
+**Desarrollado con ❤️ como proyecto de PSP, PMDM y DI.**
+
+</div>
+
+

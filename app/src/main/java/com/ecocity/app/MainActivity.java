@@ -3,6 +3,7 @@ package com.ecocity.app;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private FloatingActionButton fabAdd;
-    private TextView tvEmpty;
+    private LinearLayout tvEmpty;
     private IncidenciaDAO incidenciaDAO;
     private IncidenciaAdapter adapter;
 
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadIncidencias() {
         List<Incidencia> lista = incidenciaDAO.getAllIncidencias();
-        
+
         if (lista.isEmpty()) {
             tvEmpty.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);

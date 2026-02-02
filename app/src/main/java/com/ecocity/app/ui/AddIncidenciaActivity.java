@@ -8,10 +8,19 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import com.ecocity.app.R;
-import com.ecocity.app.database.IncidenciaDAO;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.FileProvider;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import android.widget.ImageView;
 import com.ecocity.app.model.Incidencia;
-import com.google.android.material.textfield.TextInputEditText;
 
 public class AddIncidenciaActivity extends AppCompatActivity {
 
@@ -23,8 +32,19 @@ public class AddIncidenciaActivity extends AppCompatActivity {
     private android.widget.TextView tvLocationStatusDetail;
     private Button btnSave;
     private Button btnDelete;
+
+    // Multimedia
+    private ImageView ivFoto;
+    private Button btnCamera, btnGallery;
+    private String currentPhotoPath;
+    private Uri currentPhotoUri;
+
     private IncidenciaDAO incidenciaDAO;
     private Incidencia incidenciaToEdit;
+
+    // Launchers
+    private ActivityResultLauncher<Uri> cameraLauncher;
+    private ActivityResultLauncher<String> galleryLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,12 +59,19 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         spinnerEstado = findViewById(R.id.spinnerEstado);
 
         tvLocationStatusDetail = findViewById(R.id.tvLocationStatusDetail);
+
+        // Multimedia Views
+        ivFoto = findViewById(R.id.ivFoto);
+        btnCamera = findViewById(R.id.btnCamera);
+        btnGallery = findViewById(R.id.btnGallery);
+
         btnSave = findViewById(R.id.btnSave);
         btnDelete = findViewById(R.id.btnDelete);
 
         incidenciaDAO = new IncidenciaDAO(this);
         incidenciaDAO.open();
 
+        setupLaunchers();
         setupSpinner();
 
         // Check for Intent extras
@@ -55,6 +82,10 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             // Default for new incidence
             tvLocationStatusDetail.setText("Pendiente (Se podrá añadir tras guardar)");
         }
+
+        btnCamera.setOnClickListener(v -> dispatchTakePictureIntent());
+
+        btnGallery.setOnClickListener(v -> galleryLauncher.launch("image/*"));
 
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,6 +100,71 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                 deleteIncidencia();
             }
         });
+    }
+
+    private void setupLaunchers() {
+        cameraLauncher = registerForActivityResult(
+                new ActivityResultContracts.TakePicture(),
+                success -> {
+                    if (success) {
+                        ivFoto.setPadding(0, 0, 0, 0);
+                        ivFoto.setImageURI(currentPhotoUri);
+                    }
+                });
+
+        galleryLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) {
+                        ivFoto.setPadding(0, 0, 0, 0);
+                        ivFoto.setImageURI(uri);
+                        // For simplicity in this demo, strict file path might be tricky from gallery
+                        // URI
+                        // without copying file. We will just save URI string for now.
+                        currentPhotoPath = uri.toString();
+
+                        // Note: Persisting Gallery URI permissions across restarts is complex.
+                        // Ideally copy stream to internal file, but for demo we assume ephemeral or
+                        // simple.
+                        // To make it robust:
+                        try {
+                            // Taking persistable permission if possible
+                            getContentResolver().takePersistableUriPermission(uri,
+                                    Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+    }
+
+    private void dispatchTakePictureIntent() {
+        File photoFile = null;
+        try {
+            photoFile = createImageFile();
+        } catch (IOException ex) {
+            Toast.makeText(this, "Error creando archivo", Toast.LENGTH_SHORT).show();
+        }
+
+        if (photoFile != null) {
+            currentPhotoUri = FileProvider.getUriForFile(this,
+                    "com.ecocity.app.fileprovider",
+                    photoFile);
+            cameraLauncher.launch(currentPhotoUri);
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName, /* prefix */
+                ".jpg", /* suffix */
+                storageDir /* directory */
+        );
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
     }
 
     private void setupSpinner() {
@@ -104,6 +200,23 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                 spinnerEstado.setSelection(posEstado);
             }
 
+            // Load Image
+            if (incidenciaToEdit.getFotoPath() != null && !incidenciaToEdit.getFotoPath().isEmpty()) {
+                currentPhotoPath = incidenciaToEdit.getFotoPath();
+                try {
+                    // Check if it's a content URI or file path
+                    if (currentPhotoPath.startsWith("content://")) {
+                        ivFoto.setImageURI(Uri.parse(currentPhotoPath));
+                    } else {
+                        // Assume absolute file path
+                        ivFoto.setImageURI(Uri.fromFile(new File(currentPhotoPath)));
+                    }
+                    ivFoto.setPadding(0, 0, 0, 0);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
             // Location Status
             if (incidenciaToEdit.getLatitud() != 0.0 || incidenciaToEdit.getLongitud() != 0.0) {
                 tvLocationStatusDetail.setText("Ubicación Registrada");
@@ -136,11 +249,15 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             return;
         }
 
+        // Use saved path or empty string
+        String fotoPath = currentPhotoPath != null ? currentPhotoPath : "";
+
         if (incidenciaToEdit != null) {
             // Update existing
             incidenciaToEdit.setTitulo(titulo);
             incidenciaToEdit.setDescripcion(descripcion);
             incidenciaToEdit.setUrgencia(urgencia);
+            incidenciaToEdit.setFotoPath(fotoPath);
 
             // Update Status
             String estado = spinnerEstado.getSelectedItem().toString();
@@ -155,7 +272,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             }
         } else {
             // Create new
-            Incidencia incidencia = new Incidencia(titulo, descripcion, urgencia, "", 0.0, 0.0);
+            Incidencia incidencia = new Incidencia(titulo, descripcion, urgencia, fotoPath, 0.0, 0.0);
             // Default status is already Pendiente via Constructor
             long result = incidenciaDAO.insertIncidencia(incidencia);
 

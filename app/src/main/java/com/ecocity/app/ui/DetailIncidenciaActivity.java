@@ -12,13 +12,16 @@ import com.ecocity.app.R;
 import com.ecocity.app.model.Incidencia;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import android.net.Uri;
+import java.io.File;
+
 public class DetailIncidenciaActivity extends AppCompatActivity {
 
     private Incidencia incidencia;
 
     private TextView tvTitulo, tvDescripcion, tvUrgencia, tvEstado, tvLocationText;
     private CardView cardUrgencia, cardEstado;
-    private ImageView ivEstadoIcon;
+    private ImageView ivEstadoIcon, ivHeader;
     private FloatingActionButton fabEdit;
 
     @Override
@@ -36,6 +39,7 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
         cardUrgencia = findViewById(R.id.cardUrgencia);
         cardEstado = findViewById(R.id.cardEstado);
         ivEstadoIcon = findViewById(R.id.ivEstadoIcon);
+        ivHeader = findViewById(R.id.ivHeader);
 
         fabEdit = findViewById(R.id.fabEdit);
 
@@ -64,6 +68,20 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
 
         tvTitulo.setText(incidencia.getTitulo());
         tvDescripcion.setText(incidencia.getDescripcion());
+
+        // Load Image
+        if (incidencia.getFotoPath() != null && !incidencia.getFotoPath().isEmpty()) {
+            try {
+                if (incidencia.getFotoPath().startsWith("content://")) {
+                    ivHeader.setImageURI(Uri.parse(incidencia.getFotoPath()));
+                } else {
+                    ivHeader.setImageURI(Uri.fromFile(new File(incidencia.getFotoPath())));
+                }
+                ivHeader.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         setupUrgencyChip();
         setupStatusChip();

@@ -23,6 +23,8 @@ import java.util.Date;
 import java.util.Locale;
 import android.widget.ImageView;
 import com.ecocity.app.model.Incidencia;
+import com.ecocity.app.database.IncidenciaDAO;
+import com.ecocity.app.R;
 
 public class AddIncidenciaActivity extends AppCompatActivity {
 

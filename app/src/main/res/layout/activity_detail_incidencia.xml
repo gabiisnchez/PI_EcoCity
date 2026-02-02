@@ -185,12 +185,13 @@
                             android:layout_marginStart="12dp"/>
                     </LinearLayout>
 
-                    <!-- Placeholder for Map View -->
-                    <View
+                    <!-- Map View (Lite Mode) -->
+                    <com.google.android.gms.maps.MapView
+                        android:id="@+id/mapView"
                         android:layout_width="match_parent"
-                        android:layout_height="120dp"
-                        android:background="#E0E0E0"
-                        android:layout_margin="4dp"/>
+                        android:layout_height="150dp"
+                        android:layout_marginTop="8dp"
+                        app:liteMode="true"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

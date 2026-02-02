@@ -45,6 +45,11 @@ public class AddIncidenciaActivity extends AppCompatActivity {
     // Launchers
     private ActivityResultLauncher<Uri> cameraLauncher;
     private ActivityResultLauncher<String> galleryLauncher;
+    private ActivityResultLauncher<Intent> mapLauncher;
+
+    // Coords
+    private double currentLat = 0.0;
+    private double currentLng = 0.0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +70,10 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         btnCamera = findViewById(R.id.btnCamera);
         btnGallery = findViewById(R.id.btnGallery);
 
+        // Location UI
+        Button btnAddLocation = findViewById(R.id.btnAddLocation);
+        btnAddLocation.setEnabled(true); // Enable button now!
+
         btnSave = findViewById(R.id.btnSave);
         btnDelete = findViewById(R.id.btnDelete);
 
@@ -80,12 +89,17 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             setupEditMode();
         } else {
             // Default for new incidence
-            tvLocationStatusDetail.setText("Pendiente (Se podrá añadir tras guardar)");
+            tvLocationStatusDetail.setText("Pendiente (Toca 'Añadir Ubicación')");
         }
 
         btnCamera.setOnClickListener(v -> dispatchTakePictureIntent());
 
         btnGallery.setOnClickListener(v -> galleryLauncher.launch("image/*"));
+
+        btnAddLocation.setOnClickListener(v -> {
+            Intent intent = new Intent(AddIncidenciaActivity.this, MapActivity.class);
+            mapLauncher.launch(intent);
+        });
 
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,6 +148,19 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+                    }
+                });
+
+        mapLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        currentLat = result.getData().getDoubleExtra("lat", 0.0);
+                        currentLng = result.getData().getDoubleExtra("lng", 0.0);
+
+                        tvLocationStatusDetail.setText("Ubicación Registrada (" + String.format("%.4f", currentLat)
+                                + ", " + String.format("%.4f", currentLng) + ")");
+                        tvLocationStatusDetail.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
                     }
                 });
     }
@@ -219,7 +246,10 @@ public class AddIncidenciaActivity extends AppCompatActivity {
 
             // Location Status
             if (incidenciaToEdit.getLatitud() != 0.0 || incidenciaToEdit.getLongitud() != 0.0) {
-                tvLocationStatusDetail.setText("Ubicación Registrada");
+                currentLat = incidenciaToEdit.getLatitud();
+                currentLng = incidenciaToEdit.getLongitud();
+                tvLocationStatusDetail.setText("Ubicación Registrada (" + String.format("%.4f", currentLat) + ", "
+                        + String.format("%.4f", currentLng) + ")");
                 tvLocationStatusDetail.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
             } else {
                 tvLocationStatusDetail.setText("Pendiente (Toca para añadir)");
@@ -258,6 +288,8 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             incidenciaToEdit.setDescripcion(descripcion);
             incidenciaToEdit.setUrgencia(urgencia);
             incidenciaToEdit.setFotoPath(fotoPath);
+            incidenciaToEdit.setLatitud(currentLat);
+            incidenciaToEdit.setLongitud(currentLng);
 
             // Update Status
             String estado = spinnerEstado.getSelectedItem().toString();
@@ -272,7 +304,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             }
         } else {
             // Create new
-            Incidencia incidencia = new Incidencia(titulo, descripcion, urgencia, fotoPath, 0.0, 0.0);
+            Incidencia incidencia = new Incidencia(titulo, descripcion, urgencia, fotoPath, currentLat, currentLng);
             // Default status is already Pendiente via Constructor
             long result = incidenciaDAO.insertIncidencia(incidencia);
 

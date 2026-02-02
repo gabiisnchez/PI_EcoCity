@@ -14,6 +14,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import android.net.Uri;
 import java.io.File;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class DetailIncidenciaActivity extends AppCompatActivity {
 
@@ -23,6 +29,7 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
     private CardView cardUrgencia, cardEstado;
     private ImageView ivEstadoIcon, ivHeader;
     private FloatingActionButton fabEdit;
+    private MapView mapView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +47,10 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
         cardEstado = findViewById(R.id.cardEstado);
         ivEstadoIcon = findViewById(R.id.ivEstadoIcon);
         ivHeader = findViewById(R.id.ivHeader);
+
+        ivHeader = findViewById(R.id.ivHeader);
+        mapView = findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
 
         fabEdit = findViewById(R.id.fabEdit);
 
@@ -139,11 +150,52 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
     private void setupLocation() {
         if (incidencia.getLatitud() != 0.0 || incidencia.getLongitud() != 0.0) {
             tvLocationText.setText(
-                    "Ubicación Registrada\nLat: " + incidencia.getLatitud() + ", Lon: " + incidencia.getLongitud());
+                    "Ubicación Registrada\nLat: " + String.format("%.4f", incidencia.getLatitud()) + ", Lon: "
+                            + String.format("%.4f", incidencia.getLongitud()));
             tvLocationText.setTextColor(Color.parseColor("#2E7D32"));
+
+            mapView.setVisibility(View.VISIBLE);
+            mapView.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+                    LatLng location = new LatLng(incidencia.getLatitud(), incidencia.getLongitud());
+                    googleMap.addMarker(new MarkerOptions().position(location).title("Incidencia"));
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f));
+                    googleMap.getUiSettings().setMapToolbarEnabled(false);
+                }
+            });
         } else {
             tvLocationText.setText("Sin ubicación");
             tvLocationText.setTextColor(Color.parseColor("#757575"));
+            mapView.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mapView != null)
+            mapView.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mapView != null)
+            mapView.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mapView != null)
+            mapView.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        if (mapView != null)
+            mapView.onLowMemory();
     }
 }

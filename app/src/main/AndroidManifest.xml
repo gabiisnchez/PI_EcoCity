@@ -4,6 +4,8 @@
 
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
         android:allowBackup="true"
@@ -14,6 +16,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.EcoCity">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDMpZ3nZMQSOaWo5zapeRvx07wsNn0Ui9I"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -37,6 +43,7 @@
         <activity android:name=".ui.AddIncidenciaActivity" android:exported="false" android:label="@string/title_activity_add_incidencia"/>
         <activity android:name=".ui.DetailIncidenciaActivity" android:exported="false" android:label="Detalle Incidencia"/>
         <activity android:name=".ui.ChatActivity" android:exported="false" android:label="Soporte Técnico" android:windowSoftInputMode="adjustResize"/>
+        <activity android:name=".ui.MapActivity" android:exported="false" android:label="Seleccionar Ubicación"/>
     </application>
 
 </manifest>

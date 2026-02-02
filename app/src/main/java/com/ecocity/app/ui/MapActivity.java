@@ -59,6 +59,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         try {
             mMap.setMyLocationEnabled(false); // Can enable if permissions granted
             mMap.getUiSettings().setZoomControlsEnabled(true);
+
+            // Add padding to move Google Logo and Zoom Controls up
+            // 100dp gives enough space for the bottom button
+            float density = getResources().getDisplayMetrics().density;
+            int bottomPadding = (int) (100 * density);
+            mMap.setPadding(0, 0, 0, bottomPadding);
+
         } catch (SecurityException e) {
             e.printStackTrace();
         }

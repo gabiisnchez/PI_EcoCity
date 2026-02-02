@@ -14,10 +14,13 @@ import com.google.android.material.textfield.TextInputEditText;
 public class LoginActivity extends AppCompatActivity {
 
     private TextInputEditText etEmail, etPassword, etName, etSurnames;
-    private com.google.android.material.textfield.TextInputLayout tilName, tilSurnames;
+    private com.google.android.material.textfield.TextInputLayout tilName, tilSurnames, tilEmail, tilPassword;
     private Button btnLogin;
     private android.widget.TextView tvToggleMode, tvTitle;
+
     private boolean isLoginMode = true;
+    private String registeredEmail = "";
+    private String registeredPassword = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +35,8 @@ public class LoginActivity extends AppCompatActivity {
         
         tilName = findViewById(R.id.tilName);
         tilSurnames = findViewById(R.id.tilSurnames);
+        tilEmail = findViewById(R.id.tilEmail);
+        tilPassword = findViewById(R.id.tilPassword);
 
         btnLogin = findViewById(R.id.btnLogin);
         tvToggleMode = findViewById(R.id.tvToggleMode);
@@ -40,15 +45,34 @@ public class LoginActivity extends AppCompatActivity {
         // Toggle Mode Logic
         tvToggleMode.setOnClickListener(v -> toggleMode());
 
+        // TextWatchers to clear errors when user types
+        android.text.TextWatcher textWatcher = new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                tilEmail.setError(null);
+                tilPassword.setError(null);
+            }
+            @Override
+            public void afterTextChanged(android.text.Editable s) {}
+        };
+        etEmail.addTextChangedListener(textWatcher);
+        etPassword.addTextChangedListener(textWatcher);
+
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (validateInput()) {
-                    if (isLoginMode) {
-                        performLogin();
-                    } else {
-                        performRegistration();
-                    }
+            // Restaurar estado inicial
+            tilEmail.setError(null);
+            tilPassword.setError(null);
+            
+            if (validateInput()) {
+                if (isLoginMode) {
+                    performLogin();
+                } else {
+                    performRegistration();
+                }
                 }
             }
         });
@@ -78,16 +102,24 @@ public class LoginActivity extends AppCompatActivity {
         String password = etPassword.getText().toString().trim();
 
         if (TextUtils.isEmpty(email)) {
-            etEmail.setError("El correo es requerido");
+            tilEmail.setError("El correo es requerido");
             return false;
+        } else {
+            tilEmail.setError(null);
         }
+        
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            etEmail.setError("Correo inválido");
+            tilEmail.setError("Correo inválido");
             return false;
+        } else {
+            tilEmail.setError(null);
         }
+        
         if (TextUtils.isEmpty(password)) {
-            etPassword.setError("La contraseña es requerida");
+            tilPassword.setError("La contraseña es requerida");
             return false;
+        } else {
+            tilPassword.setError(null);
         }
 
         if (!isLoginMode) {
@@ -95,27 +127,48 @@ public class LoginActivity extends AppCompatActivity {
             String surnames = etSurnames.getText().toString().trim();
 
             if (TextUtils.isEmpty(name)) {
-                etName.setError("El nombre es requerido");
+                tilName.setError("El nombre es requerido");
                 return false;
+            } else {
+                tilName.setError(null);
             }
+            
             if (TextUtils.isEmpty(surnames)) {
-                etSurnames.setError("Los apellidos son requeridos");
+                tilSurnames.setError("Los apellidos son requeridos");
                 return false;
+            } else {
+                tilSurnames.setError(null);
             }
         }
         return true;
     }
 
     private void performLogin() {
-        // Simulation for now
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(intent);
-        finish();
+        // Simulación de autenticación
+        String email = etEmail.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
+        // Credenciales harcodeadas O las registradas recientemente
+        if ((email.equals("usuario@ecocity.com") && password.equals("123456")) || 
+            (!TextUtils.isEmpty(registeredEmail) && email.equals(registeredEmail) && password.equals(registeredPassword))) {
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            // Mostrar mensaje de error en AMBOS campos
+            tilEmail.setError(" "); 
+            tilPassword.setError("Correo o contraseña incorrectos");
+            
+            etPassword.requestFocus();
+            Toast.makeText(this, "Error de autenticación", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void performRegistration() {
-        // Simulation for now - In future save to DB
-        Toast.makeText(this, "Registro exitoso. Por favor inicia sesión.", Toast.LENGTH_SHORT).show();
+        // Guardar credenciales en memoria para la sesión actual
+        registeredEmail = etEmail.getText().toString().trim();
+        registeredPassword = etPassword.getText().toString().trim();
+        
+        Toast.makeText(this, "Registro exitoso. Ahora puedes iniciar sesión con tus datos.", Toast.LENGTH_SHORT).show();
         toggleMode(); // Switch back to login
     }
 }

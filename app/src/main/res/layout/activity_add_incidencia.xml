@@ -86,10 +86,37 @@
                 android:id="@+id/spinnerUrgencia"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="40dp"
+                android:layout_marginBottom="24dp"
                 android:background="@drawable/input_field_bg"
                 android:minHeight="56dp"
                 android:padding="8dp" />
+
+            <!-- Status Section (Visible only in Edit Mode) -->
+            <LinearLayout
+                android:id="@+id/layoutEstado"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:text="Estado de la incidencia"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <Spinner
+                    android:id="@+id/spinnerEstado"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="40dp"
+                    android:background="@drawable/input_field_bg"
+                    android:minHeight="56dp"
+                    android:padding="8dp" />
+            </LinearLayout>
 
             <!-- Location Section -->
             <TextView

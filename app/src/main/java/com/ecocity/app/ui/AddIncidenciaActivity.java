@@ -17,6 +17,9 @@ public class AddIncidenciaActivity extends AppCompatActivity {
 
     private TextInputEditText etTitulo, etDescripcion;
     private Spinner spinnerUrgencia;
+    private android.widget.LinearLayout layoutEstado;
+    private Spinner spinnerEstado;
+
     private android.widget.TextView tvLocationStatusDetail;
     private Button btnSave;
     private Button btnDelete;
@@ -31,6 +34,10 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         etTitulo = findViewById(R.id.etTitulo);
         etDescripcion = findViewById(R.id.etDescripcion);
         spinnerUrgencia = findViewById(R.id.spinnerUrgencia);
+
+        layoutEstado = findViewById(R.id.layoutEstado);
+        spinnerEstado = findViewById(R.id.spinnerEstado);
+
         tvLocationStatusDetail = findViewById(R.id.tvLocationStatusDetail);
         btnSave = findViewById(R.id.btnSave);
         btnDelete = findViewById(R.id.btnDelete);
@@ -69,6 +76,12 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, urgencias);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerUrgencia.setAdapter(adapter);
+
+        // Setup Status Spinner
+        String[] estados = { "Pendiente", "En proceso", "Resuelta" };
+        ArrayAdapter<String> adapterEstado = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, estados);
+        adapterEstado.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerEstado.setAdapter(adapterEstado);
     }
 
     private void setupEditMode() {
@@ -81,6 +94,14 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             int position = adapter.getPosition(incidenciaToEdit.getUrgencia());
             if (position >= 0) {
                 spinnerUrgencia.setSelection(position);
+            }
+
+            // Show and set Status
+            layoutEstado.setVisibility(View.VISIBLE);
+            ArrayAdapter<String> adapterEstado = (ArrayAdapter<String>) spinnerEstado.getAdapter();
+            int posEstado = adapterEstado.getPosition(incidenciaToEdit.getEstado());
+            if (posEstado >= 0) {
+                spinnerEstado.setSelection(posEstado);
             }
 
             // Location Status
@@ -121,6 +142,10 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             incidenciaToEdit.setDescripcion(descripcion);
             incidenciaToEdit.setUrgencia(urgencia);
 
+            // Update Status
+            String estado = spinnerEstado.getSelectedItem().toString();
+            incidenciaToEdit.setEstado(estado);
+
             int result = incidenciaDAO.updateIncidencia(incidenciaToEdit);
             if (result > 0) {
                 Toast.makeText(this, "Actualizado correctamente", Toast.LENGTH_SHORT).show();
@@ -131,6 +156,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         } else {
             // Create new
             Incidencia incidencia = new Incidencia(titulo, descripcion, urgencia, "", 0.0, 0.0);
+            // Default status is already Pendiente via Constructor
             long result = incidenciaDAO.insertIncidencia(incidencia);
 
             if (result != -1) {

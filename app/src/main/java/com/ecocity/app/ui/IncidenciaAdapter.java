@@ -64,11 +64,38 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<IncidenciaAdapter.In
             holder.ivLocationIcon.setColorFilter(Color.parseColor("#FF9800"));
         }
 
+        // Status Styling Logic
+        int statusBgColor;
+        int statusTextColor;
+        int statusIconRes;
+
+        String estado = incidencia.getEstado() != null ? incidencia.getEstado() : "Pendiente";
+
+        if (estado.equalsIgnoreCase("En proceso")) {
+            statusBgColor = Color.parseColor("#E3F2FD"); // Light Blue
+            statusTextColor = Color.parseColor("#1976D2"); // Dark Blue
+            statusIconRes = android.R.drawable.ic_popup_sync;
+        } else if (estado.equalsIgnoreCase("Resuelta")) {
+            statusBgColor = Color.parseColor("#E8F5E9"); // Light Green
+            statusTextColor = Color.parseColor("#388E3C"); // Dark Green
+            statusIconRes = android.R.drawable.checkbox_on_background;
+        } else {
+            // Pendiente (Default)
+            statusBgColor = Color.parseColor("#EEEEEE"); // Light Grey
+            statusTextColor = Color.parseColor("#616161"); // Dark Grey
+            statusIconRes = android.R.drawable.ic_menu_help;
+        }
+
+        holder.chipEstado.setCardBackgroundColor(statusBgColor);
+        holder.tvEstado.setTextColor(statusTextColor);
+        holder.ivEstadoIcon.setImageResource(statusIconRes);
+        holder.ivEstadoIcon.setColorFilter(statusTextColor);
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 android.content.Context context = v.getContext();
-                android.content.Intent intent = new android.content.Intent(context, AddIncidenciaActivity.class);
+                android.content.Intent intent = new android.content.Intent(context, DetailIncidenciaActivity.class);
                 intent.putExtra("incidencia", incidencia);
                 context.startActivity(intent);
             }
@@ -83,8 +110,8 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<IncidenciaAdapter.In
     public static class IncidenciaViewHolder extends RecyclerView.ViewHolder {
         TextView tvTitulo, tvDescripcion, tvUrgencia, tvEstado, tvLocationStatus;
         View statusBar;
-        CardView chipUrgencia;
-        android.widget.ImageView ivLocationIcon;
+        CardView chipUrgencia, chipEstado;
+        android.widget.ImageView ivLocationIcon, ivEstadoIcon;
 
         public IncidenciaViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -96,6 +123,9 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<IncidenciaAdapter.In
             chipUrgencia = itemView.findViewById(R.id.chipUrgencia);
             tvLocationStatus = itemView.findViewById(R.id.tvLocationStatus);
             ivLocationIcon = itemView.findViewById(R.id.ivLocationIcon);
+
+            chipEstado = itemView.findViewById(R.id.chipEstado);
+            ivEstadoIcon = itemView.findViewById(R.id.ivEstadoIcon);
         }
     }
 }

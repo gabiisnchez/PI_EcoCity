@@ -22,6 +22,7 @@
 
         <activity android:name=".MainActivity" android:exported="false"/>
         <activity android:name=".ui.AddIncidenciaActivity" android:exported="false" android:label="@string/title_activity_add_incidencia"/>
+        <activity android:name=".ui.DetailIncidenciaActivity" android:exported="false" android:label="Detalle Incidencia"/>
     </application>
 
 </manifest>

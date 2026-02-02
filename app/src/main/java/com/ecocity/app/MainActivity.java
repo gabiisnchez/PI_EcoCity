@@ -18,7 +18,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private FloatingActionButton fabAdd;
+    private FloatingActionButton fabAdd, fabChat;
     private LinearLayout tvEmpty;
     private IncidenciaDAO incidenciaDAO;
     private IncidenciaAdapter adapter;
@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerView);
         fabAdd = findViewById(R.id.fabAdd);
+        fabChat = findViewById(R.id.fabChat);
         tvEmpty = findViewById(R.id.tvEmpty);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -41,6 +42,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, AddIncidenciaActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        fabChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, com.ecocity.app.ui.ChatActivity.class);
                 startActivity(intent);
             }
         });

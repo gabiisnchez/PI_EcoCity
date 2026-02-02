@@ -36,6 +36,7 @@
         <activity android:name=".MainActivity" android:exported="false"/>
         <activity android:name=".ui.AddIncidenciaActivity" android:exported="false" android:label="@string/title_activity_add_incidencia"/>
         <activity android:name=".ui.DetailIncidenciaActivity" android:exported="false" android:label="Detalle Incidencia"/>
+        <activity android:name=".ui.ChatActivity" android:exported="false" android:label="Soporte Técnico" android:windowSoftInputMode="adjustResize"/>
     </application>
 
 </manifest>

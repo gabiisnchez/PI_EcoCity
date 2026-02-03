@@ -11,11 +11,22 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.Toast;
+import android.location.Geocoder;
+import android.location.Address;
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+import android.view.inputmethod.EditorInfo;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private Button btnConfirmLocation;
+    private EditText etSearch;
+    private ImageButton btnSearch;
     private com.google.android.gms.location.FusedLocationProviderClient fusedLocationClient;
 
     private final androidx.activity.result.ActivityResultLauncher<String[]> locationPermissionRequest = registerForActivityResult(
@@ -43,7 +54,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_map);
 
         btnConfirmLocation = findViewById(R.id.btnConfirmLocation);
+        etSearch = findViewById(R.id.etSearch);
+        btnSearch = findViewById(R.id.btnSearch);
+
         fusedLocationClient = com.google.android.gms.location.LocationServices.getFusedLocationProviderClient(this);
+
+        btnSearch.setOnClickListener(v -> searchLocation());
+
+        etSearch.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                searchLocation();
+                return true;
+            }
+            return false;
+        });
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -113,6 +137,36 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(madrid, 15f));
                         }
                     });
+        }
+    }
+
+    private void searchLocation() {
+        String location = etSearch.getText().toString();
+        if (location == null || location.equals("")) {
+            Toast.makeText(this, "Introduce una dirección", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> addressList = geocoder.getFromLocationName(location, 1);
+            if (addressList != null && !addressList.isEmpty()) {
+                Address address = addressList.get(0);
+                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f));
+
+                // Close keyboard
+                android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(
+                        INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.hideSoftInputFromWindow(etSearch.getWindowToken(), 0);
+                }
+            } else {
+                Toast.makeText(this, "No se encontró la ubicación", Toast.LENGTH_SHORT).show();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error de red o servicio", Toast.LENGTH_SHORT).show();
         }
     }
 }

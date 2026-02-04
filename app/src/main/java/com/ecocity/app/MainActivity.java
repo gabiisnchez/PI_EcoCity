@@ -46,6 +46,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.btnProfile).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, com.ecocity.app.ui.ProfileActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
         fabChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

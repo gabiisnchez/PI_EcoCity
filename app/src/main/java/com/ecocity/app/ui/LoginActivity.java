@@ -21,10 +21,20 @@ public class LoginActivity extends AppCompatActivity {
     private boolean isLoginMode = true;
     private String registeredEmail = "";
     private String registeredPassword = "";
+    private com.ecocity.app.utils.SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        session = new com.ecocity.app.utils.SessionManager(getApplicationContext());
+        if (session.isLoggedIn()) {
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+            return; // Important so we don't continue creating the login UI
+        }
+        
         setContentView(R.layout.activity_login);
 
         // Bind Views
@@ -150,6 +160,16 @@ public class LoginActivity extends AppCompatActivity {
         // Credenciales harcodeadas O las registradas recientemente
         if ((email.equals("usuario@ecocity.com") && password.equals("123456")) || 
             (!TextUtils.isEmpty(registeredEmail) && email.equals(registeredEmail) && password.equals(registeredPassword))) {
+            // Crear sesión
+            // Como es una simulacion, si usamos user hardcodeado, inventamos nombre
+            if (email.equals("usuario@ecocity.com")) {
+                session.createLoginSession("Usuario Demo", email);
+            } else {
+                // Si usamos el registrado, usamos el mail como nombre provisorio si no lo tenemos a mano (o deberiamos haberlo guardado)
+                // Para simplificar, usamos "Usuario Registrado"
+                session.createLoginSession("Usuario", email);
+            }
+
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
@@ -168,7 +188,12 @@ public class LoginActivity extends AppCompatActivity {
         registeredEmail = etEmail.getText().toString().trim();
         registeredPassword = etPassword.getText().toString().trim();
         
-        Toast.makeText(this, "Registro exitoso. Ahora puedes iniciar sesión con tus datos.", Toast.LENGTH_SHORT).show();
-        toggleMode(); // Switch back to login
+        // Guardar sesión directamente para entrar
+        String name = etName.getText().toString().trim();
+        session.createLoginSession(name, registeredEmail);
+        
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

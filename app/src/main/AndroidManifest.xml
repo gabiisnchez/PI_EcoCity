@@ -49,6 +49,7 @@
         <activity android:name=".ui.DetailIncidenciaActivity" android:exported="false" android:label="Detalle Incidencia"/>
         <activity android:name=".ui.ChatActivity" android:exported="false" android:label="Soporte Técnico" android:windowSoftInputMode="adjustResize"/>
         <activity android:name=".ui.MapActivity" android:exported="false" android:label="Seleccionar Ubicación"/>
+        <activity android:name=".ui.ProfileActivity" android:exported="false" android:label="Mi Perfil"/>
     </application>
 
 </manifest>

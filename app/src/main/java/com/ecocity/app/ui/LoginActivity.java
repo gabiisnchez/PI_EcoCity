@@ -21,6 +21,7 @@ public class LoginActivity extends AppCompatActivity {
     private boolean isLoginMode = true;
     private String registeredEmail = "";
     private String registeredPassword = "";
+    private String registeredName = "";
     private com.ecocity.app.utils.SessionManager session;
 
     @Override
@@ -157,17 +158,24 @@ public class LoginActivity extends AppCompatActivity {
         // Simulación de autenticación
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
-        // Credenciales harcodeadas O las registradas recientemente
-        if ((email.equals("usuario@ecocity.com") && password.equals("123456")) || 
-            (!TextUtils.isEmpty(registeredEmail) && email.equals(registeredEmail) && password.equals(registeredPassword))) {
+        
+        // Obtener usuario registrado de "Base de atos simulada"
+        java.util.HashMap<String, String> registeredUser = session.getRegisteredUser();
+        String savedEmail = registeredUser.get(com.ecocity.app.utils.SessionManager.KEY_REGISTERED_EMAIL);
+        String savedPass = registeredUser.get(com.ecocity.app.utils.SessionManager.KEY_REGISTERED_PASS);
+        String savedName = registeredUser.get(com.ecocity.app.utils.SessionManager.KEY_REGISTERED_NAME);
+
+        // Credenciales harcodeadas O las registradas (ahora persistentes)
+        boolean isDemoUser = email.equals("usuario@ecocity.com") && password.equals("123456");
+        boolean isRegisteredUser = email.equals(savedEmail) && password.equals(savedPass);
+
+        if (isDemoUser || isRegisteredUser) {
             // Crear sesión
-            // Como es una simulacion, si usamos user hardcodeado, inventamos nombre
-            if (email.equals("usuario@ecocity.com")) {
+            if (isDemoUser) {
                 session.createLoginSession("Usuario Demo", email);
             } else {
-                // Si usamos el registrado, usamos el mail como nombre provisorio si no lo tenemos a mano (o deberiamos haberlo guardado)
-                // Para simplificar, usamos "Usuario Registrado"
-                session.createLoginSession("Usuario", email);
+                String displayName = !android.text.TextUtils.isEmpty(savedName) ? savedName : "Usuario";
+                session.createLoginSession(displayName, email);
             }
 
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -184,16 +192,21 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void performRegistration() {
-        // Guardar credenciales en memoria para la sesión actual
-        registeredEmail = etEmail.getText().toString().trim();
-        registeredPassword = etPassword.getText().toString().trim();
-        
-        // Guardar sesión directamente para entrar
+        String email = etEmail.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
         String name = etName.getText().toString().trim();
-        session.createLoginSession(name, registeredEmail);
         
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(intent);
-        finish();
+        // Guardar simulando escritura en DB
+        session.saveRegisteredUser(name, email, password);
+        
+        Toast.makeText(this, "Registro exitoso. Por favor inicia sesión.", Toast.LENGTH_SHORT).show();
+        
+        // Limpiar para obligar a loguear
+        etEmail.setText("");
+        etPassword.setText("");
+        etName.setText("");
+        etSurnames.setText(""); // Si tuvieramos este campo en DB también
+        
+        toggleMode(); // Cambiar a modo Login
     }
 }

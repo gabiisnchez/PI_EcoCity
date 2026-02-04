@@ -81,7 +81,7 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<IncidenciaAdapter.In
         } else if (estado.equalsIgnoreCase("Resuelta")) {
             statusBgColor = Color.parseColor("#E8F5E9"); // Light Green
             statusTextColor = Color.parseColor("#388E3C"); // Dark Green
-            statusIconRes = android.R.drawable.checkbox_on_background;
+            statusIconRes = R.drawable.ic_check;
         } else {
             // Pendiente (Default)
             statusBgColor = Color.parseColor("#EEEEEE"); // Light Grey

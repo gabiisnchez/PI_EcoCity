@@ -19,9 +19,9 @@ public class SessionManager {
     public static final String KEY_EMAIL = "email";
     
     // Simulated Database Keys
-    private static final String KEY_REGISTERED_EMAIL = "sim_email";
-    private static final String KEY_REGISTERED_PASS = "sim_pass";
-    private static final String KEY_REGISTERED_NAME = "sim_name";
+    public static final String KEY_REGISTERED_EMAIL = "sim_email";
+    public static final String KEY_REGISTERED_PASS = "sim_pass";
+    public static final String KEY_REGISTERED_NAME = "sim_name";
 
     public SessionManager(Context context) {
         this._context = context;

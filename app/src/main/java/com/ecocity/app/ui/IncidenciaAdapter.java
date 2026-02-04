@@ -37,7 +37,10 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<IncidenciaAdapter.In
 
         // Dynamic styling based on urgency
         int urgencyColor;
-        switch (incidencia.getUrgencia().toLowerCase()) {
+        String urgencia = incidencia.getUrgencia();
+        if (urgencia == null) urgencia = "Baja"; // Valor por defecto
+
+        switch (urgencia.toLowerCase()) {
             case "alta":
                 urgencyColor = Color.parseColor("#E53935"); // Match colors.xml urgency_high
                 break;

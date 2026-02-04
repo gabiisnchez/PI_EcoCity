@@ -69,8 +69,13 @@ public class IncidenciaDAO {
                 Incidencia incidencia = new Incidencia();
                 incidencia.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_ID)));
                 incidencia.setTitulo(cursor.getString(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_TITULO)));
-                incidencia.setDescripcion(cursor.getString(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_DESCRIPCION)));
-                incidencia.setUrgencia(cursor.getString(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_URGENCIA)));
+                
+                String descripcion = cursor.getString(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_DESCRIPCION));
+                incidencia.setDescripcion(descripcion != null ? descripcion : "");
+
+                String urgencia = cursor.getString(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_URGENCIA));
+                incidencia.setUrgencia(urgencia != null ? urgencia : "Baja");
+                
                 incidencia.setFotoPath(cursor.getString(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_FOTOPATH)));
                 incidencia.setEstado(cursor.getString(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_ESTADO)));
                 incidencia.setLatitud(cursor.getDouble(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_LATITUD)));

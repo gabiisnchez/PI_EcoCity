@@ -50,6 +50,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
     private ActivityResultLauncher<Uri> cameraLauncher;
     private ActivityResultLauncher<String> galleryLauncher;
     private ActivityResultLauncher<Intent> mapLauncher;
+    private ActivityResultLauncher<String> requestCameraPermissionLauncher;
 
     // Coords
     private double currentLat = 0.0;
@@ -100,7 +101,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             tvLocationStatusDetail.setText("Pendiente (Toca 'Añadir Ubicación')");
         }
 
-        btnCamera.setOnClickListener(v -> dispatchTakePictureIntent());
+        btnCamera.setOnClickListener(v -> checkCameraPermissionAndOpen());
 
         btnGallery.setOnClickListener(v -> galleryLauncher.launch("image/*"));
 
@@ -171,35 +172,42 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                         tvLocationStatusDetail.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
                     }
                 });
+
+        requestCameraPermissionLauncher =
+
+                registerForActivityResult(
+                        new ActivityResultContracts.RequestPermission(),
+                        isGranted -> {
+                            if (isGranted) {
+                                dispatchTakePictureIntent();
+                            } else {
+                                Toast.makeText(this, "Permiso de cámara necesario para tomar fotos", Toast.LENGTH_SHORT)
+                                        .show();
+                            }
+                        });
     }
 
     private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                Toast.makeText(this, "Error creando archivo para foto", Toast.LENGTH_SHORT).show();
-            }
+        File photoFile = null;
+        try {
+            photoFile = createImageFile();
+        } catch (IOException ex) {
+            Toast.makeText(this, "Error creando archivo para foto", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-            if (photoFile != null) {
-                try {
-                    currentPhotoUri = FileProvider.getUriForFile(this,
-                            "com.ecocity.app.fileprovider",
-                            photoFile);
-                    cameraLauncher.launch(currentPhotoUri);
-                } catch (Exception e) {
-                    Toast.makeText(this, "Error iniciando cámara: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                    e.printStackTrace();
-                }
+        if (photoFile != null) {
+            try {
+                currentPhotoUri = FileProvider.getUriForFile(this,
+                        "com.ecocity.app.fileprovider",
+                        photoFile);
+                cameraLauncher.launch(currentPhotoUri);
+            } catch (android.content.ActivityNotFoundException e) {
+                Toast.makeText(this, "No se encontró una aplicación de cámara", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Toast.makeText(this, "Error reservando cámara: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                e.printStackTrace();
             }
-        } else {
-            // Fallback or attempt to launch anyway inside try-catch if resolveActivity
-            // returns null on some devices despite queries
-            // But valid resolveActivity check is better UX
-            Toast.makeText(this, "No se encontró aplicación de cámara", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -227,6 +235,15 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         ArrayAdapter<String> adapterEstado = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, estados);
         adapterEstado.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerEstado.setAdapter(adapterEstado);
+    }
+
+    private void checkCameraPermissionAndOpen() {
+        if (androidx.core.content.ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.CAMERA) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            dispatchTakePictureIntent();
+        } else {
+            requestCameraPermissionLauncher.launch(android.Manifest.permission.CAMERA);
+        }
     }
 
     private void setupEditMode() {

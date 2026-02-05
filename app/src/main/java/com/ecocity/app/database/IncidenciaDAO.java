@@ -69,13 +69,13 @@ public class IncidenciaDAO {
                 Incidencia incidencia = new Incidencia();
                 incidencia.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_ID)));
                 incidencia.setTitulo(cursor.getString(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_TITULO)));
-                
+
                 String descripcion = cursor.getString(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_DESCRIPCION));
                 incidencia.setDescripcion(descripcion != null ? descripcion : "");
 
                 String urgencia = cursor.getString(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_URGENCIA));
                 incidencia.setUrgencia(urgencia != null ? urgencia : "Baja");
-                
+
                 incidencia.setFotoPath(cursor.getString(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_FOTOPATH)));
                 incidencia.setEstado(cursor.getString(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_ESTADO)));
                 incidencia.setLatitud(cursor.getDouble(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_LATITUD)));
@@ -86,5 +86,28 @@ public class IncidenciaDAO {
         }
         cursor.close();
         return incidencias;
+    }
+
+    public int getIncidenciasCount(String estado) {
+        int count = 0;
+        String selection = null;
+        String[] selectionArgs = null;
+
+        if (estado != null) {
+            selection = DbHelper.COLUMN_ESTADO + " = ?";
+            selectionArgs = new String[] { estado };
+        }
+
+        Cursor cursor = database.query(DbHelper.TABLE_INCIDENCIAS,
+                new String[] { "COUNT(*)" },
+                selection,
+                selectionArgs,
+                null, null, null);
+
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+        cursor.close();
+        return count;
     }
 }

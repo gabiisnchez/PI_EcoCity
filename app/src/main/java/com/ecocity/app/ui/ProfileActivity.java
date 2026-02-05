@@ -15,10 +15,16 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView tvUserName, tvUserEmail;
     private Button btnLogout;
 
+    // Stats
+    private TextView tvCountTotal, tvCountResolved, tvCountProcess, tvCountPending;
+    private com.ecocity.app.database.IncidenciaDAO incidenciaDAO;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        incidenciaDAO = new com.ecocity.app.database.IncidenciaDAO(this);
 
         session = new SessionManager(getApplicationContext());
         // Check if user is logged in
@@ -29,6 +35,12 @@ public class ProfileActivity extends AppCompatActivity {
         tvUserName = findViewById(R.id.tvUserName);
         tvUserEmail = findViewById(R.id.tvUserEmail);
         btnLogout = findViewById(R.id.btnLogout);
+
+        // Stats Views
+        tvCountTotal = findViewById(R.id.tvCountTotal);
+        tvCountResolved = findViewById(R.id.tvCountResolved);
+        tvCountProcess = findViewById(R.id.tvCountProcess);
+        tvCountPending = findViewById(R.id.tvCountPending);
 
         HashMap<String, String> user = session.getUserDetails();
         String name = user.get(SessionManager.KEY_NAME);
@@ -44,5 +56,31 @@ public class ProfileActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadStats();
+    }
+
+    private void loadStats() {
+        incidenciaDAO.open();
+
+        int total = incidenciaDAO.getIncidenciasCount(null);
+        int resolved = incidenciaDAO.getIncidenciasCount("Resuelta");
+        int process = incidenciaDAO.getIncidenciasCount("En proceso");
+        int pending = incidenciaDAO.getIncidenciasCount("Pendiente");
+
+        tvCountTotal.setText(String.valueOf(total));
+        tvCountResolved.setText(String.valueOf(resolved));
+        tvCountProcess.setText(String.valueOf(process));
+        tvCountPending.setText(String.valueOf(pending));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        incidenciaDAO.close();
     }
 }

@@ -174,18 +174,32 @@ public class AddIncidenciaActivity extends AppCompatActivity {
     }
 
     private void dispatchTakePictureIntent() {
-        File photoFile = null;
-        try {
-            photoFile = createImageFile();
-        } catch (IOException ex) {
-            Toast.makeText(this, "Error creando archivo", Toast.LENGTH_SHORT).show();
-        }
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                Toast.makeText(this, "Error creando archivo para foto", Toast.LENGTH_SHORT).show();
+            }
 
-        if (photoFile != null) {
-            currentPhotoUri = FileProvider.getUriForFile(this,
-                    "com.ecocity.app.fileprovider",
-                    photoFile);
-            cameraLauncher.launch(currentPhotoUri);
+            if (photoFile != null) {
+                try {
+                    currentPhotoUri = FileProvider.getUriForFile(this,
+                            "com.ecocity.app.fileprovider",
+                            photoFile);
+                    cameraLauncher.launch(currentPhotoUri);
+                } catch (Exception e) {
+                    Toast.makeText(this, "Error iniciando cámara: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            // Fallback or attempt to launch anyway inside try-catch if resolveActivity
+            // returns null on some devices despite queries
+            // But valid resolveActivity check is better UX
+            Toast.makeText(this, "No se encontró aplicación de cámara", Toast.LENGTH_SHORT).show();
         }
     }
 

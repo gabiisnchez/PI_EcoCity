@@ -24,6 +24,8 @@ public class ProfileActivity extends AppCompatActivity {
         // Check if user is logged in
         session.checkLogin();
 
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
         tvUserName = findViewById(R.id.tvUserName);
         tvUserEmail = findViewById(R.id.tvUserEmail);
         btnLogout = findViewById(R.id.btnLogout);

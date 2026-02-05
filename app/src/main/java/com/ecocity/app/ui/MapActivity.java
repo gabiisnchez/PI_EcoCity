@@ -57,6 +57,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         etSearch = findViewById(R.id.etSearch);
         btnSearch = findViewById(R.id.btnSearch);
 
+        btnSearch = findViewById(R.id.btnSearch);
+
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
         fusedLocationClient = com.google.android.gms.location.LocationServices.getFusedLocationProviderClient(this);
 
         btnSearch.setOnClickListener(v -> searchLocation());

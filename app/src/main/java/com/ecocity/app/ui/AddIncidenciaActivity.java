@@ -61,6 +61,10 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_incidencia);
 
         etTitulo = findViewById(R.id.etTitulo);
+
+        android.widget.ImageButton btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish());
+
         etDescripcion = findViewById(R.id.etDescripcion);
         spinnerUrgencia = findViewById(R.id.spinnerUrgencia);
 

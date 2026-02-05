@@ -29,6 +29,9 @@ public class ChatActivity extends AppCompatActivity {
 
         rvChat = findViewById(R.id.rvChat);
         etMessage = findViewById(R.id.etMessage);
+
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
         btnSend = findViewById(R.id.btnSend);
 
         messageList = new ArrayList<>();

@@ -54,6 +54,8 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
 
         fabEdit = findViewById(R.id.fabEdit);
 
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
         // Get Data
         if (getIntent().hasExtra("incidencia")) {
             incidencia = (Incidencia) getIntent().getSerializableExtra("incidencia");

@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DbHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "EcoCity.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public static final String TABLE_INCIDENCIAS = "incidencias";
     public static final String COLUMN_ID = "id";
@@ -18,9 +18,9 @@ public class DbHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ESTADO = "estado";
     public static final String COLUMN_LATITUD = "latitud";
     public static final String COLUMN_LONGITUD = "longitud";
+    public static final String COLUMN_USER_EMAIL = "user_email";
 
-    private static final String TABLE_CREATE =
-            "CREATE TABLE " + TABLE_INCIDENCIAS + " (" +
+    private static final String TABLE_CREATE = "CREATE TABLE " + TABLE_INCIDENCIAS + " (" +
             COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COLUMN_TITULO + " TEXT, " +
             COLUMN_DESCRIPCION + " TEXT, " +
@@ -28,7 +28,8 @@ public class DbHelper extends SQLiteOpenHelper {
             COLUMN_FOTOPATH + " TEXT, " +
             COLUMN_ESTADO + " TEXT, " +
             COLUMN_LATITUD + " REAL, " +
-            COLUMN_LONGITUD + " REAL" +
+            COLUMN_LONGITUD + " REAL, " +
+            COLUMN_USER_EMAIL + " TEXT" +
             ");";
 
     public DbHelper(Context context) {

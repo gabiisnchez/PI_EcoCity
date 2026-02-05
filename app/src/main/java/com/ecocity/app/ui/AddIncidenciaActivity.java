@@ -327,6 +327,13 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         } else {
             // Create new
             Incidencia incidencia = new Incidencia(titulo, descripcion, urgencia, fotoPath, currentLat, currentLng);
+
+            // Set User Email
+            com.ecocity.app.utils.SessionManager session = new com.ecocity.app.utils.SessionManager(
+                    getApplicationContext());
+            String email = session.getUserDetails().get(com.ecocity.app.utils.SessionManager.KEY_EMAIL);
+            incidencia.setUserEmail(email);
+
             // Default status is already Pendiente via Constructor
             long result = incidenciaDAO.insertIncidencia(incidencia);
 

@@ -67,10 +67,12 @@ public class ProfileActivity extends AppCompatActivity {
     private void loadStats() {
         incidenciaDAO.open();
 
-        int total = incidenciaDAO.getIncidenciasCount(null);
-        int resolved = incidenciaDAO.getIncidenciasCount("Resuelta");
-        int process = incidenciaDAO.getIncidenciasCount("En proceso");
-        int pending = incidenciaDAO.getIncidenciasCount("Pendiente");
+        String email = session.getUserDetails().get(SessionManager.KEY_EMAIL);
+
+        int total = incidenciaDAO.getIncidenciasCount(email, null);
+        int resolved = incidenciaDAO.getIncidenciasCount(email, "Resuelta");
+        int process = incidenciaDAO.getIncidenciasCount(email, "En proceso");
+        int pending = incidenciaDAO.getIncidenciasCount(email, "Pendiente");
 
         tvCountTotal.setText(String.valueOf(total));
         tvCountResolved.setText(String.valueOf(resolved));

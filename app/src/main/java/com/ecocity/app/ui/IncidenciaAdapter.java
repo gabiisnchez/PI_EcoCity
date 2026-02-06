@@ -42,14 +42,16 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         // Group data
         for (Incidencia inc : allIncidencias) {
-            String status = inc.getEstado() != null ? inc.getEstado() : "Pendiente";
-            // Normalize status to match keys if necessary (simple check)
-            if (groupedIncidencias.containsKey(status)) {
-                groupedIncidencias.get(status).add(inc);
-            } else {
-                // Fallback for unknown status
-                groupedIncidencias.get("Pendiente").add(inc);
+            String statusRaw = inc.getEstado() != null ? inc.getEstado() : "Pendiente";
+            String statusKey = "Pendiente"; // Default
+
+            if (statusRaw.equalsIgnoreCase("En proceso")) {
+                statusKey = "En Proceso";
+            } else if (statusRaw.equalsIgnoreCase("Resuelta")) {
+                statusKey = "Resuelta";
             }
+
+            groupedIncidencias.get(statusKey).add(inc);
         }
 
         buildDisplayList();
@@ -59,13 +61,38 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         displayList.clear();
         for (String section : SECTIONS) {
             List<Incidencia> items = groupedIncidencias.get(section);
-            if (items != null && !items.isEmpty()) {
-                displayList.add(section); // Add Header Key
-                if (expandedSections.get(section)) {
-                    displayList.addAll(items);
-                }
+            // Always add header, even if items is null/empty
+            displayList.add(section); // Add Header Key
+
+            if (items != null && !items.isEmpty() && expandedSections.get(section)) {
+                displayList.addAll(items);
             }
         }
+    }
+
+    public void updateData(List<Incidencia> newIncidencias) {
+        // Clear current groupings but keep keys
+        for (String section : SECTIONS) {
+            groupedIncidencias.put(section, new ArrayList<>());
+        }
+
+        // Re-group data
+        for (Incidencia inc : newIncidencias) {
+            String statusRaw = inc.getEstado() != null ? inc.getEstado() : "Pendiente";
+            String statusKey = "Pendiente"; // Default
+
+            if (statusRaw.equalsIgnoreCase("En proceso")) {
+                statusKey = "En Proceso";
+            } else if (statusRaw.equalsIgnoreCase("Resuelta")) {
+                statusKey = "Resuelta";
+            }
+
+            groupedIncidencias.get(statusKey).add(inc);
+        }
+
+        // Rebuild list with new data but same expansion state
+        buildDisplayList();
+        notifyDataSetChanged();
     }
 
     @Override
@@ -152,8 +179,7 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         private void toggleSection(String section) {
             boolean isExpanded = expandedSections.get(section);
             List<Incidencia> items = groupedIncidencias.get(section);
-            if (items == null || items.isEmpty())
-                return;
+            // Allow toggling even if empty so arrow rotates and state is saved
 
             int headerPosition = getAdapterPosition();
             if (headerPosition == RecyclerView.NO_POSITION)
@@ -164,6 +190,10 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             // Animate arrow
             ivExpand.animate().rotation(!isExpanded ? 180f : 0f).setDuration(200).start();
+
+            // If empty, no list changes needed
+            if (items == null || items.isEmpty())
+                return;
 
             if (isExpanded) {
                 // Collapse: Remove items from displayList and notify

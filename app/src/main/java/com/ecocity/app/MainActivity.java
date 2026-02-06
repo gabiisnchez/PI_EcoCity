@@ -85,8 +85,13 @@ public class MainActivity extends AppCompatActivity {
         } else {
             tvEmpty.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
-            adapter = new IncidenciaAdapter(lista);
-            recyclerView.setAdapter(adapter);
+
+            if (adapter == null) {
+                adapter = new IncidenciaAdapter(lista);
+                recyclerView.setAdapter(adapter);
+            } else {
+                adapter.updateData(lista);
+            }
         }
     }
 

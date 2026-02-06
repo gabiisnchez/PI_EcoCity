@@ -17,11 +17,9 @@ public class SessionManager {
     private static final String IS_LOGIN = "IsLoggedIn";
     public static final String KEY_NAME = "name";
     public static final String KEY_EMAIL = "email";
-    
-    // Simulated Database Keys
-    public static final String KEY_REGISTERED_EMAIL = "sim_email";
-    public static final String KEY_REGISTERED_PASS = "sim_pass";
-    public static final String KEY_REGISTERED_NAME = "sim_name";
+
+    // Simulated Database Keys - REMOVED
+    // We now use SQLite for user storage
 
     public SessionManager(Context context) {
         this._context = context;
@@ -33,23 +31,10 @@ public class SessionManager {
         editor.putBoolean(IS_LOGIN, true);
         editor.putString(KEY_NAME, name);
         editor.putString(KEY_EMAIL, email);
-        editor.apply(); // apply is async, better than commit
-    }
-    
-    public void saveRegisteredUser(String name, String email, String password) {
-        editor.putString(KEY_REGISTERED_NAME, name);
-        editor.putString(KEY_REGISTERED_EMAIL, email);
-        editor.putString(KEY_REGISTERED_PASS, password);
         editor.apply();
     }
-    
-    public HashMap<String, String> getRegisteredUser() {
-        HashMap<String, String> user = new HashMap<>();
-        user.put(KEY_REGISTERED_NAME, pref.getString(KEY_REGISTERED_NAME, ""));
-        user.put(KEY_REGISTERED_EMAIL, pref.getString(KEY_REGISTERED_EMAIL, ""));
-        user.put(KEY_REGISTERED_PASS, pref.getString(KEY_REGISTERED_PASS, ""));
-        return user;
-    }
+
+    // saveRegisteredUser and getRegisteredUser removed - use UserDAO instead
 
     public void checkLogin() {
         if (!this.isLoggedIn()) {
@@ -73,7 +58,7 @@ public class SessionManager {
         editor.remove(KEY_NAME);
         editor.remove(KEY_EMAIL);
         editor.apply();
-        
+
         Intent i = new Intent(_context, LoginActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

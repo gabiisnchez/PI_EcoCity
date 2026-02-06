@@ -18,10 +18,8 @@ public class LoginActivity extends AppCompatActivity {
     private Button btnLogin;
     private android.widget.TextView tvToggleMode, tvTitle;
 
+    private com.ecocity.app.database.UserDAO userDAO;
     private boolean isLoginMode = true;
-    private String registeredEmail = "";
-    private String registeredPassword = "";
-    private String registeredName = "";
     private com.ecocity.app.utils.SessionManager session;
 
     @Override
@@ -33,8 +31,11 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
-            return; // Important so we don't continue creating the login UI
+            return;
         }
+
+        userDAO = new com.ecocity.app.database.UserDAO(this);
+        userDAO.open();
 
         androidx.activity.EdgeToEdge.enable(this);
 
@@ -86,7 +87,7 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Restaurar estado inicial
+                // Restore initial state
                 tilEmail.setError(null);
                 tilPassword.setError(null);
 
@@ -167,37 +168,26 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void performLogin() {
-        // Simulación de autenticación
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
-        // Obtener usuario registrado de "Base de atos simulada"
-        java.util.HashMap<String, String> registeredUser = session.getRegisteredUser();
-        String savedEmail = registeredUser.get(com.ecocity.app.utils.SessionManager.KEY_REGISTERED_EMAIL);
-        String savedPass = registeredUser.get(com.ecocity.app.utils.SessionManager.KEY_REGISTERED_PASS);
-        String savedName = registeredUser.get(com.ecocity.app.utils.SessionManager.KEY_REGISTERED_NAME);
+        // 1. Check strict demo user
+        if (email.equals("usuario@ecocity.com") && password.equals("123456")) {
+            session.createLoginSession("Usuario Demo", email);
+            launchMainActivity();
+            return;
+        }
 
-        // Credenciales harcodeadas O las registradas (ahora persistentes)
-        boolean isDemoUser = email.equals("usuario@ecocity.com") && password.equals("123456");
-        boolean isRegisteredUser = email.equals(savedEmail) && password.equals(savedPass);
+        // 2. Check Database
+        com.ecocity.app.model.User user = userDAO.login(email, password);
 
-        if (isDemoUser || isRegisteredUser) {
-            // Crear sesión
-            if (isDemoUser) {
-                session.createLoginSession("Usuario Demo", email);
-            } else {
-                String displayName = !android.text.TextUtils.isEmpty(savedName) ? savedName : "Usuario";
-                session.createLoginSession(displayName, email);
-            }
-
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
+        if (user != null) {
+            session.createLoginSession(user.getName(), user.getEmail());
+            launchMainActivity();
         } else {
-            // Mostrar mensaje de error en AMBOS campos
+            // Show error
             tilEmail.setError(" ");
             tilPassword.setError("Correo o contraseña incorrectos");
-
             etPassword.requestFocus();
             Toast.makeText(this, "Error de autenticación", Toast.LENGTH_SHORT).show();
         }
@@ -208,17 +198,42 @@ public class LoginActivity extends AppCompatActivity {
         String password = etPassword.getText().toString().trim();
         String name = etName.getText().toString().trim();
 
-        // Guardar simulando escritura en DB
-        session.saveRegisteredUser(name, email, password);
+        // Check if exists
+        if (userDAO.checkEmailExists(email)) {
+            tilEmail.setError("El correo ya está registrado");
+            return;
+        }
 
-        Toast.makeText(this, "Registro exitoso. Por favor inicia sesión.", Toast.LENGTH_SHORT).show();
+        // Save to DB
+        com.ecocity.app.model.User newUser = new com.ecocity.app.model.User(name, email, password);
+        long result = userDAO.registerUser(newUser);
 
-        // Limpiar para obligar a loguear
-        etEmail.setText("");
-        etPassword.setText("");
-        etName.setText("");
-        etSurnames.setText(""); // Si tuvieramos este campo en DB también
+        if (result > 0) {
+            Toast.makeText(this, "Registro exitoso. Por favor inicia sesión.", Toast.LENGTH_SHORT).show();
 
-        toggleMode(); // Cambiar a modo Login
+            // Clear inputs
+            etEmail.setText("");
+            etPassword.setText("");
+            etName.setText("");
+            etSurnames.setText("");
+
+            toggleMode(); // Switch to login
+        } else {
+            Toast.makeText(this, "Error en el registro", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void launchMainActivity() {
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (userDAO != null) {
+            userDAO.close();
+        }
     }
 }

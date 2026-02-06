@@ -25,7 +25,7 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
 
     private Incidencia incidencia;
 
-    private TextView tvTitulo, tvDescripcion, tvUrgencia, tvEstado, tvLocationText;
+    private TextView tvTitulo, tvDescripcion, tvUrgencia, tvEstado, tvLocationText, tvUserEmail;
     private CardView cardUrgencia, cardEstado;
     private ImageView ivEstadoIcon, ivHeader;
     private FloatingActionButton fabEdit;
@@ -49,6 +49,7 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
         tvUrgencia = findViewById(R.id.tvUrgencia);
         tvEstado = findViewById(R.id.tvEstado);
         tvLocationText = findViewById(R.id.tvLocationText);
+        tvUserEmail = findViewById(R.id.tvUserEmail);
 
         cardUrgencia = findViewById(R.id.cardUrgencia);
         cardEstado = findViewById(R.id.cardEstado);
@@ -105,7 +106,17 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
 
         setupUrgencyChip();
         setupStatusChip();
+
+        setupAuthorEmail();
         setupLocation();
+    }
+
+    private void setupAuthorEmail() {
+        if (incidencia.getUserEmail() != null && !incidencia.getUserEmail().isEmpty()) {
+            tvUserEmail.setText(incidencia.getUserEmail());
+        } else {
+            tvUserEmail.setText("Desconocido");
+        }
     }
 
     private void setupUrgencyChip() {

@@ -27,7 +27,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         session = new com.ecocity.app.utils.SessionManager(getApplicationContext());
         if (session.isLoggedIn()) {
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -35,15 +35,23 @@ public class LoginActivity extends AppCompatActivity {
             finish();
             return; // Important so we don't continue creating the login UI
         }
-        
+
+        androidx.activity.EdgeToEdge.enable(this);
+
         setContentView(R.layout.activity_login);
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            androidx.core.graphics.Insets systemBars = insets
+                    .getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         // Bind Views
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         etName = findViewById(R.id.etName);
         etSurnames = findViewById(R.id.etSurnames);
-        
+
         tilName = findViewById(R.id.tilName);
         tilSurnames = findViewById(R.id.tilSurnames);
         tilEmail = findViewById(R.id.tilEmail);
@@ -59,14 +67,18 @@ public class LoginActivity extends AppCompatActivity {
         // TextWatchers to clear errors when user types
         android.text.TextWatcher textWatcher = new android.text.TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 tilEmail.setError(null);
                 tilPassword.setError(null);
             }
+
             @Override
-            public void afterTextChanged(android.text.Editable s) {}
+            public void afterTextChanged(android.text.Editable s) {
+            }
         };
         etEmail.addTextChangedListener(textWatcher);
         etPassword.addTextChangedListener(textWatcher);
@@ -74,16 +86,16 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            // Restaurar estado inicial
-            tilEmail.setError(null);
-            tilPassword.setError(null);
-            
-            if (validateInput()) {
-                if (isLoginMode) {
-                    performLogin();
-                } else {
-                    performRegistration();
-                }
+                // Restaurar estado inicial
+                tilEmail.setError(null);
+                tilPassword.setError(null);
+
+                if (validateInput()) {
+                    if (isLoginMode) {
+                        performLogin();
+                    } else {
+                        performRegistration();
+                    }
                 }
             }
         });
@@ -95,7 +107,7 @@ public class LoginActivity extends AppCompatActivity {
             tvTitle.setText("Bienvenido");
             btnLogin.setText(getString(R.string.btn_login));
             tvToggleMode.setText("¿No tienes cuenta? Registrate aquí");
-            
+
             tilName.setVisibility(View.GONE);
             tilSurnames.setVisibility(View.GONE);
         } else {
@@ -118,14 +130,14 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             tilEmail.setError(null);
         }
-        
+
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             tilEmail.setError("Correo inválido");
             return false;
         } else {
             tilEmail.setError(null);
         }
-        
+
         if (TextUtils.isEmpty(password)) {
             tilPassword.setError("La contraseña es requerida");
             return false;
@@ -143,7 +155,7 @@ public class LoginActivity extends AppCompatActivity {
             } else {
                 tilName.setError(null);
             }
-            
+
             if (TextUtils.isEmpty(surnames)) {
                 tilSurnames.setError("Los apellidos son requeridos");
                 return false;
@@ -158,7 +170,7 @@ public class LoginActivity extends AppCompatActivity {
         // Simulación de autenticación
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
-        
+
         // Obtener usuario registrado de "Base de atos simulada"
         java.util.HashMap<String, String> registeredUser = session.getRegisteredUser();
         String savedEmail = registeredUser.get(com.ecocity.app.utils.SessionManager.KEY_REGISTERED_EMAIL);
@@ -183,9 +195,9 @@ public class LoginActivity extends AppCompatActivity {
             finish();
         } else {
             // Mostrar mensaje de error en AMBOS campos
-            tilEmail.setError(" "); 
+            tilEmail.setError(" ");
             tilPassword.setError("Correo o contraseña incorrectos");
-            
+
             etPassword.requestFocus();
             Toast.makeText(this, "Error de autenticación", Toast.LENGTH_SHORT).show();
         }
@@ -195,18 +207,18 @@ public class LoginActivity extends AppCompatActivity {
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         String name = etName.getText().toString().trim();
-        
+
         // Guardar simulando escritura en DB
         session.saveRegisteredUser(name, email, password);
-        
+
         Toast.makeText(this, "Registro exitoso. Por favor inicia sesión.", Toast.LENGTH_SHORT).show();
-        
+
         // Limpiar para obligar a loguear
         etEmail.setText("");
         etPassword.setText("");
         etName.setText("");
         etSurnames.setText(""); // Si tuvieramos este campo en DB también
-        
+
         toggleMode(); // Cambiar a modo Login
     }
 }

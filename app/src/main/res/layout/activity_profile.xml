@@ -9,7 +9,7 @@
     <LinearLayout
         android:id="@+id/headerProfile"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="290dp"
         android:background="@drawable/bg_gradient"
         android:gravity="center"
         android:orientation="vertical"
@@ -55,7 +55,8 @@
             android:layout_height="wrap_content"
             android:text="correo@ejemplo.com"
             android:textColor="#E0E0E0"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:layout_marginBottom="24dp"/>
     </LinearLayout>
 
     <LinearLayout

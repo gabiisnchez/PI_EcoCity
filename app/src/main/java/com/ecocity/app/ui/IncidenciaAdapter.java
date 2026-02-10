@@ -16,16 +16,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Adaptador para el RecyclerView de Incidencias.
+ * Gestiona una lista heterogénea con cabeceras de sección (Strings) e items de incidencia (Incidencia).
+ * Soporta secciones expandibles/colapsables por estado.
+ */
 public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
 
-    private List<Object> displayList; // Can be String (Header) or Incidencia (Item)
+    private List<Object> displayList; // Puede ser String (Cabecera) o Incidencia (Item)
     private Map<String, List<Incidencia>> groupedIncidencias;
     private Map<String, Boolean> expandedSections;
 
-    // Ordered keys for sections
+    // Claves ordenadas para las secciones
     private final String[] SECTIONS = { "Pendiente", "En Proceso", "Resuelta" };
 
     public IncidenciaAdapter(List<Incidencia> allIncidencias) {
@@ -33,17 +38,17 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.expandedSections = new HashMap<>();
         this.displayList = new ArrayList<>();
 
-        // Initialize groups
+        // Inicializar grupos
         for (String section : SECTIONS) {
             groupedIncidencias.put(section, new ArrayList<>());
-            // Collapse "Resuelta" by default, expand others
+            // Colapsar "Resuelta" por defecto, expandir otras
             expandedSections.put(section, !section.equals("Resuelta"));
         }
 
-        // Group data
+        // Agrupar datos
         for (Incidencia inc : allIncidencias) {
             String statusRaw = inc.getEstado() != null ? inc.getEstado() : "Pendiente";
-            String statusKey = "Pendiente"; // Default
+            String statusKey = "Pendiente"; // Por defecto
 
             if (statusRaw.equalsIgnoreCase("En proceso")) {
                 statusKey = "En Proceso";
@@ -61,8 +66,8 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         displayList.clear();
         for (String section : SECTIONS) {
             List<Incidencia> items = groupedIncidencias.get(section);
-            // Always add header, even if items is null/empty
-            displayList.add(section); // Add Header Key
+            // Siempre añadir cabecera, incluso si está vacía
+            displayList.add(section);
 
             if (items != null && !items.isEmpty() && expandedSections.get(section)) {
                 displayList.addAll(items);
@@ -71,15 +76,15 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public void updateData(List<Incidencia> newIncidencias) {
-        // Clear current groupings but keep keys
+        // Limpiar agrupaciones actuales pero mantener claves
         for (String section : SECTIONS) {
             groupedIncidencias.put(section, new ArrayList<>());
         }
 
-        // Re-group data
+        // Re-agrupar datos
         for (Incidencia inc : newIncidencias) {
             String statusRaw = inc.getEstado() != null ? inc.getEstado() : "Pendiente";
-            String statusKey = "Pendiente"; // Default
+            String statusKey = "Pendiente"; // Por defecto
 
             if (statusRaw.equalsIgnoreCase("En proceso")) {
                 statusKey = "En Proceso";
@@ -90,7 +95,7 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             groupedIncidencias.get(statusKey).add(inc);
         }
 
-        // Rebuild list with new data but same expansion state
+        // Reconstruir lista con nuevos datos manteniendo estado de expansión
         buildDisplayList();
         notifyDataSetChanged();
     }
@@ -159,7 +164,7 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             tvStatusTitle.setText(section + " (" + count + ")");
 
             boolean isExpanded = expandedSections.get(section);
-            ivExpand.setRotation(isExpanded ? 180f : 0f); // Set initial state without animation
+            ivExpand.setRotation(isExpanded ? 180f : 0f); // Estado inicial
 
             int color;
             switch (section) {
@@ -179,32 +184,31 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         private void toggleSection(String section) {
             boolean isExpanded = expandedSections.get(section);
             List<Incidencia> items = groupedIncidencias.get(section);
-            // Allow toggling even if empty so arrow rotates and state is saved
+            // Permitir toggle incluso si está vacío para rotar flecha
 
             int headerPosition = getAdapterPosition();
             if (headerPosition == RecyclerView.NO_POSITION)
                 return;
 
-            // Update state
+            // Actualizar estado
             expandedSections.put(section, !isExpanded);
 
-            // Animate arrow
+            // Animar flecha
             ivExpand.animate().rotation(!isExpanded ? 180f : 0f).setDuration(200).start();
 
-            // If empty, no list changes needed
+            // Si está vacío, no hay cambios en la lista
             if (items == null || items.isEmpty())
                 return;
 
             if (isExpanded) {
-                // Collapse: Remove items from displayList and notify
-                // Items represent the elements AFTER the header
+                // Colapsar: Remover items de displayList y notificar
                 int count = items.size();
                 for (int i = 0; i < count; i++) {
                     displayList.remove(headerPosition + 1);
                 }
                 notifyItemRangeRemoved(headerPosition + 1, count);
             } else {
-                // Expand: Add items to displayList and notify
+                // Expandir: Añadir items a displayList y notificar
                 int count = items.size();
                 for (int i = 0; i < count; i++) {
                     displayList.add(headerPosition + 1 + i, items.get(i));
@@ -241,7 +245,7 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             tvUrgencia.setText(incidencia.getUrgencia());
             tvEstado.setText(incidencia.getEstado());
 
-            // Dynamic styling based on urgency
+            // Estilos dinámicos según urgencia
             int urgencyColor;
             String urgencia = incidencia.getUrgencia() != null ? incidencia.getUrgencia() : "Baja";
 
@@ -261,7 +265,7 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             chipUrgencia.setCardBackgroundColor(Color.parseColor("#F5F5F5"));
             tvUrgencia.setTextColor(urgencyColor);
 
-            // Location Status
+            // Estado de Ubicación
             if (incidencia.getLatitud() != 0.0 || incidencia.getLongitud() != 0.0) {
                 tvLocationStatus.setText("Ubicación registrada");
                 tvLocationStatus.setTextColor(Color.parseColor("#2E7D32"));
@@ -272,7 +276,7 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 ivLocationIcon.setColorFilter(Color.parseColor("#FF9800"));
             }
 
-            // Status Styling
+            // Estilos de Estado
             int statusBgColor;
             int statusTextColor;
             int statusIconRes;

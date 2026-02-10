@@ -26,6 +26,11 @@ import com.ecocity.app.model.Incidencia;
 import com.ecocity.app.database.IncidenciaDAO;
 import com.ecocity.app.R;
 
+/**
+ * Actividad para crear o editar una incidencia.
+ * Permite capturar fotos, seleccionar ubicación y guardar los datos en la base de datos local.
+ * Implementa lógica en segundo plano para no bloquear la UI durante el guardado.
+ */
 public class AddIncidenciaActivity extends AppCompatActivity {
 
     private TextInputEditText etTitulo, etDescripcion;
@@ -46,13 +51,13 @@ public class AddIncidenciaActivity extends AppCompatActivity {
     private IncidenciaDAO incidenciaDAO;
     private Incidencia incidenciaToEdit;
 
-    // Launchers
+    // Launchers para resultados de actividades (Cámara, Galería, Mapa, Permisos)
     private ActivityResultLauncher<Uri> cameraLauncher;
     private ActivityResultLauncher<String> galleryLauncher;
     private ActivityResultLauncher<Intent> mapLauncher;
     private ActivityResultLauncher<String> requestCameraPermissionLauncher;
 
-    // Coords
+    // Coordenadas
     private double currentLat = 0.0;
     private double currentLng = 0.0;
 
@@ -81,14 +86,14 @@ public class AddIncidenciaActivity extends AppCompatActivity {
 
         tvLocationStatusDetail = findViewById(R.id.tvLocationStatusDetail);
 
-        // Multimedia Views
+        // Vistas Multimedia
         ivFoto = findViewById(R.id.ivFoto);
         btnCamera = findViewById(R.id.btnCamera);
         btnGallery = findViewById(R.id.btnGallery);
 
-        // Location UI
+        // UI Ubicación
         Button btnAddLocation = findViewById(R.id.btnAddLocation);
-        btnAddLocation.setEnabled(true); // Enable button now!
+        btnAddLocation.setEnabled(true);
 
         btnSave = findViewById(R.id.btnSave);
         btnDelete = findViewById(R.id.btnDelete);
@@ -99,12 +104,12 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         setupLaunchers();
         setupSpinner();
 
-        // Check for Intent extras
+        // Comprobar si hay extras (Modo Edición)
         if (getIntent().hasExtra("incidencia")) {
             incidenciaToEdit = (Incidencia) getIntent().getSerializableExtra("incidencia");
             setupEditMode();
         } else {
-            // Default for new incidence
+            // Por defecto para nueva incidencia
             tvLocationStatusDetail.setText("Pendiente (Toca 'Añadir Ubicación')");
         }
 
@@ -132,6 +137,13 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Configura los ActivityResultLaunchers para manejar los retornos de:
+     * - Cámara (Foto capturada)
+     * - Galería (Imagen seleccionada)
+     * - Mapa (Ubicación seleccionada)
+     * - Permisos (Solicitud de permiso de cámara)
+     */
     private void setupLaunchers() {
         cameraLauncher = registerForActivityResult(
                 new ActivityResultContracts.TakePicture(),
@@ -148,17 +160,12 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                     if (uri != null) {
                         ivFoto.setPadding(0, 0, 0, 0);
                         ivFoto.setImageURI(uri);
-                        // For simplicity in this demo, strict file path might be tricky from gallery
-                        // URI
-                        // without copying file. We will just save URI string for now.
+                        // Para simplificar en esta demo, guardamos el toString del URI.
+                        // Lo ideal sería copiar el archivo a almacenamiento interno.
                         currentPhotoPath = uri.toString();
 
-                        // Note: Persisting Gallery URI permissions across restarts is complex.
-                        // Ideally copy stream to internal file, but for demo we assume ephemeral or
-                        // simple.
-                        // To make it robust:
                         try {
-                            // Taking persistable permission if possible
+                            // Intentar persistir el permiso de lectura del URI
                             getContentResolver().takePersistableUriPermission(uri,
                                     Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         } catch (Exception e) {
@@ -180,18 +187,16 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                     }
                 });
 
-        requestCameraPermissionLauncher =
-
-                registerForActivityResult(
-                        new ActivityResultContracts.RequestPermission(),
-                        isGranted -> {
-                            if (isGranted) {
-                                dispatchTakePictureIntent();
-                            } else {
-                                Toast.makeText(this, "Permiso de cámara necesario para tomar fotos", Toast.LENGTH_SHORT)
-                                        .show();
-                            }
-                        });
+        requestCameraPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        dispatchTakePictureIntent();
+                    } else {
+                        Toast.makeText(this, "Permiso de cámara necesario para tomar fotos", Toast.LENGTH_SHORT)
+                                .show();
+                    }
+                });
     }
 
     private void dispatchTakePictureIntent() {
@@ -237,7 +242,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerUrgencia.setAdapter(adapter);
 
-        // Setup Status Spinner
+        // Configurar Spinner de Estado
         String[] estados = { "Pendiente", "En proceso", "Resuelta" };
         ArrayAdapter<String> adapterEstado = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, estados);
         adapterEstado.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -258,14 +263,14 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             etTitulo.setText(incidenciaToEdit.getTitulo());
             etDescripcion.setText(incidenciaToEdit.getDescripcion());
 
-            // Set spinner selection
+            // Seleccionar Spinner Urgencia
             ArrayAdapter<String> adapter = (ArrayAdapter<String>) spinnerUrgencia.getAdapter();
             int position = adapter.getPosition(incidenciaToEdit.getUrgencia());
             if (position >= 0) {
                 spinnerUrgencia.setSelection(position);
             }
 
-            // Show and set Status
+            // Mostrar y configurar Spinner Estado
             layoutEstado.setVisibility(View.VISIBLE);
             ArrayAdapter<String> adapterEstado = (ArrayAdapter<String>) spinnerEstado.getAdapter();
             int posEstado = adapterEstado.getPosition(incidenciaToEdit.getEstado());
@@ -273,15 +278,15 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                 spinnerEstado.setSelection(posEstado);
             }
 
-            // Load Image
+            // Cargar Imagen
             if (incidenciaToEdit.getFotoPath() != null && !incidenciaToEdit.getFotoPath().isEmpty()) {
                 currentPhotoPath = incidenciaToEdit.getFotoPath();
                 try {
-                    // Check if it's a content URI or file path
+                    // Verificar si es content URI o ruta de archivo
                     if (currentPhotoPath.startsWith("content://")) {
                         ivFoto.setImageURI(Uri.parse(currentPhotoPath));
                     } else {
-                        // Assume absolute file path
+                        // Asumir ruta absoluta
                         ivFoto.setImageURI(Uri.fromFile(new File(currentPhotoPath)));
                     }
                     ivFoto.setPadding(0, 0, 0, 0);
@@ -290,7 +295,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                 }
             }
 
-            // Location Status
+            // Estado de Ubicación
             if (incidenciaToEdit.getLatitud() != 0.0 || incidenciaToEdit.getLongitud() != 0.0) {
                 currentLat = incidenciaToEdit.getLatitud();
                 currentLng = incidenciaToEdit.getLongitud();
@@ -299,7 +304,6 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                 tvLocationStatusDetail.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
             } else {
                 tvLocationStatusDetail.setText("Pendiente (Toca para añadir)");
-                // Here we would enable the button theoretically
             }
 
             btnSave.setText("Actualizar");
@@ -315,59 +319,79 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Guarda la incidencia en la base de datos.
+     * Ejecuta la operación de inserción/actualización en un hilo secundario (Background Thread)
+     * para cumplir con los requisitos de PSP y evitar bloquear la UI.
+     */
     private void saveIncidencia() {
-        String titulo = etTitulo.getText().toString().trim();
-        String descripcion = etDescripcion.getText().toString().trim();
-        String urgencia = spinnerUrgencia.getSelectedItem().toString();
+        final String titulo = etTitulo.getText().toString().trim();
+        final String descripcion = etDescripcion.getText().toString().trim();
+        final String urgencia = spinnerUrgencia.getSelectedItem().toString();
 
         if (TextUtils.isEmpty(titulo) || TextUtils.isEmpty(descripcion)) {
             Toast.makeText(this, R.string.msg_empty_fields, Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Use saved path or empty string
-        String fotoPath = currentPhotoPath != null ? currentPhotoPath : "";
+        // Usar ruta guardada o cadena vacía
+        final String fotoPath = currentPhotoPath != null ? currentPhotoPath : "";
+        final String estado = spinnerEstado.getSelectedItem().toString();
 
-        if (incidenciaToEdit != null) {
-            // Update existing
-            incidenciaToEdit.setTitulo(titulo);
-            incidenciaToEdit.setDescripcion(descripcion);
-            incidenciaToEdit.setUrgencia(urgencia);
-            incidenciaToEdit.setFotoPath(fotoPath);
-            incidenciaToEdit.setLatitud(currentLat);
-            incidenciaToEdit.setLongitud(currentLng);
+        // Deshabilitar botón para evitar múltiples clics
+        btnSave.setEnabled(false);
 
-            // Update Status
-            String estado = spinnerEstado.getSelectedItem().toString();
-            incidenciaToEdit.setEstado(estado);
+        // Requisito PSP: Hilo en segundo plano para operaciones de BBDD/Multimedia
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                boolean success = false;
 
-            int result = incidenciaDAO.updateIncidencia(incidenciaToEdit);
-            if (result > 0) {
-                Toast.makeText(this, "Actualizado correctamente", Toast.LENGTH_SHORT).show();
-                finish();
-            } else {
-                Toast.makeText(this, "Error al actualizar", Toast.LENGTH_SHORT).show();
+                if (incidenciaToEdit != null) {
+                    // Actualizar existente
+                    incidenciaToEdit.setTitulo(titulo);
+                    incidenciaToEdit.setDescripcion(descripcion);
+                    incidenciaToEdit.setUrgencia(urgencia);
+                    incidenciaToEdit.setFotoPath(fotoPath);
+                    incidenciaToEdit.setLatitud(currentLat);
+                    incidenciaToEdit.setLongitud(currentLng);
+                    incidenciaToEdit.setEstado(estado);
+
+                    int result = incidenciaDAO.updateIncidencia(incidenciaToEdit);
+                    success = (result > 0);
+                } else {
+                    // Crear nueva
+                    Incidencia incidencia = new Incidencia(titulo, descripcion, urgencia, fotoPath, currentLat, currentLng);
+
+                    // Asignar Email de Usuario
+                    com.ecocity.app.utils.SessionManager session = new com.ecocity.app.utils.SessionManager(getApplicationContext());
+                    String email = session.getUserDetails().get(com.ecocity.app.utils.SessionManager.KEY_EMAIL);
+                    incidencia.setUserEmail(email);
+
+                    long result = incidenciaDAO.insertIncidencia(incidencia);
+                    success = (result != -1);
+                }
+
+                // Las actualizaciones de UI deben ser en el Hilo Principal
+                final boolean finalSuccess = success;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        btnSave.setEnabled(true); // Reactivar por seguridad flujo
+                        if (finalSuccess) {
+                            Toast.makeText(AddIncidenciaActivity.this, 
+                                    incidenciaToEdit != null ? "Actualizado correctamente" : getString(R.string.msg_saved), 
+                                    Toast.LENGTH_SHORT).show();
+                            finish();
+                        } else {
+                            Toast.makeText(AddIncidenciaActivity.this, 
+                                    "Error al guardar incidencia", 
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
-        } else {
-            // Create new
-            Incidencia incidencia = new Incidencia(titulo, descripcion, urgencia, fotoPath, currentLat, currentLng);
-
-            // Set User Email
-            com.ecocity.app.utils.SessionManager session = new com.ecocity.app.utils.SessionManager(
-                    getApplicationContext());
-            String email = session.getUserDetails().get(com.ecocity.app.utils.SessionManager.KEY_EMAIL);
-            incidencia.setUserEmail(email);
-
-            // Default status is already Pendiente via Constructor
-            long result = incidenciaDAO.insertIncidencia(incidencia);
-
-            if (result != -1) {
-                Toast.makeText(this, R.string.msg_saved, Toast.LENGTH_SHORT).show();
-                finish();
-            } else {
-                Toast.makeText(this, "Error al guardar", Toast.LENGTH_SHORT).show();
-            }
-        }
+        }).start();
     }
 
     @Override

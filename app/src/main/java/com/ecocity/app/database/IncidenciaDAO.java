@@ -8,6 +8,10 @@ import com.ecocity.app.model.Incidencia;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object (DAO) para la entidad Incidencia.
+ * Gestiona todas las operaciones CRUD (Crear, Leer, Actualizar, Borrar) en SQLite.
+ */
 public class IncidenciaDAO {
 
     private SQLiteDatabase database;
@@ -17,14 +21,25 @@ public class IncidenciaDAO {
         dbHelper = new DbHelper(context);
     }
 
+    /**
+     * Abre la conexión con la base de datos en modo escritura.
+     */
     public void open() {
         database = dbHelper.getWritableDatabase();
     }
 
+    /**
+     * Cierra la conexión con la base de datos.
+     */
     public void close() {
         dbHelper.close();
     }
 
+    /**
+     * Inserta una nueva incidencia en la base de datos.
+     * @param incidencia Objeto Incidencia a insertar.
+     * @return El ID de la nueva fila o -1 si hubo error.
+     */
     public long insertIncidencia(Incidencia incidencia) {
         ContentValues values = new ContentValues();
         values.put(DbHelper.COLUMN_TITULO, incidencia.getTitulo());
@@ -39,6 +54,11 @@ public class IncidenciaDAO {
         return database.insert(DbHelper.TABLE_INCIDENCIAS, null, values);
     }
 
+    /**
+     * Actualiza una incidencia existente.
+     * @param incidencia Objeto con los nuevos datos.
+     * @return Número de filas afectadas.
+     */
     public int updateIncidencia(Incidencia incidencia) {
         ContentValues values = new ContentValues();
         values.put(DbHelper.COLUMN_TITULO, incidencia.getTitulo());
@@ -48,8 +68,7 @@ public class IncidenciaDAO {
         values.put(DbHelper.COLUMN_ESTADO, incidencia.getEstado());
         values.put(DbHelper.COLUMN_LATITUD, incidencia.getLatitud());
         values.put(DbHelper.COLUMN_LONGITUD, incidencia.getLongitud());
-        // Typically we don't change the owner, but if we wanted to ensuring it persists
-        // if object has it:
+        // Normalmente no cambiamos el propietario, pero se asegura por consistencia
         // values.put(DbHelper.COLUMN_USER_EMAIL, incidencia.getUserEmail());
 
         return database.update(DbHelper.TABLE_INCIDENCIAS, values,
@@ -57,17 +76,25 @@ public class IncidenciaDAO {
                 new String[] { String.valueOf(incidencia.getId()) });
     }
 
+    /**
+     * Elimina una incidencia por su ID.
+     * @param id Identificador de la incidencia a borrar.
+     */
     public void deleteIncidencia(int id) {
         database.delete(DbHelper.TABLE_INCIDENCIAS,
                 DbHelper.COLUMN_ID + " = ?",
                 new String[] { String.valueOf(id) });
     }
 
+    /**
+     * Obtiene todas las incidencias ordenadas por Estado y Urgencia.
+     * @return Lista completa de incidencias.
+     */
     public List<Incidencia> getAllIncidencias() {
         List<Incidencia> incidencias = new ArrayList<>();
 
-        // Custom Sort:
-        // 1. Estado: En proceso > Pendiente > Resuelta (Check exact strings)
+        // Orden Personalizado:
+        // 1. Estado: En proceso > Pendientes > Resuelta
         // 2. Urgencia: Alta > Media > Baja
 
         String orderBy = "CASE " + DbHelper.COLUMN_ESTADO +
@@ -101,8 +128,7 @@ public class IncidenciaDAO {
                 incidencia.setLatitud(cursor.getDouble(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_LATITUD)));
                 incidencia.setLongitud(cursor.getDouble(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_LONGITUD)));
 
-                // Retrieve User Email if needed for list (not strictly requested but good for
-                // detail)
+                // Recuperar email del usuario propietario
                 int emailIndex = cursor.getColumnIndex(DbHelper.COLUMN_USER_EMAIL);
                 if (emailIndex != -1) {
                     incidencia.setUserEmail(cursor.getString(emailIndex));
@@ -115,18 +141,24 @@ public class IncidenciaDAO {
         return incidencias;
     }
 
+    /**
+     * Cuenta incidencias filtrando por usuario y/o estado.
+     * @param userEmail Email del usuario (opcional).
+     * @param estado Estado de la incidencia (opcional).
+     * @return Número de incidencias encontradas.
+     */
     public int getIncidenciasCount(String userEmail, String estado) {
         int count = 0;
         String selection = "";
         List<String> argsList = new ArrayList<>();
 
-        // Filter by User Email
+        // Filtrar por Email
         if (userEmail != null) {
             selection += DbHelper.COLUMN_USER_EMAIL + " = ?";
             argsList.add(userEmail);
         }
 
-        // Filter by State
+        // Filtrar por Estado
         if (estado != null) {
             if (!selection.isEmpty())
                 selection += " AND ";

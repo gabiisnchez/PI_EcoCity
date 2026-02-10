@@ -15,6 +15,11 @@ import com.ecocity.app.ui.IncidenciaAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.List;
 
+/**
+ * Actividad Principal de EcoCity.
+ * Muestra el listado de incidencias del usuario, permitiendo filtrar, navegar a detalles
+ * o crear nuevas incidencias.
+ */
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
@@ -70,12 +75,20 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Se llama cuando la actividad vuelve a estar visible.
+     * Recarga el listado de incidencias para reflejar posibles cambios.
+     */
     @Override
     protected void onResume() {
         super.onResume();
         loadIncidencias();
     }
 
+    /**
+     * Carga todas las incidencias de la base de datos y actualiza el adaptador del RecyclerView.
+     * Si no hay incidencias, muestra una vista de estado vacío.
+     */
     private void loadIncidencias() {
         List<Incidencia> lista = incidenciaDAO.getAllIncidencias();
 

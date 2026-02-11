@@ -29,8 +29,7 @@
             android:layout_height="80dp"
             android:layout_marginBottom="16dp"
             android:contentDescription="Logo"
-            android:src="@android:drawable/ic_dialog_map"
-            app:tint="@color/white" />
+            android:src="@drawable/ic_app_icon_source" />
 
         <TextView
             android:layout_width="wrap_content"

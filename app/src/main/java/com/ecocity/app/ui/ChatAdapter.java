@@ -10,8 +10,17 @@ import com.ecocity.app.R;
 import com.ecocity.app.model.Mensaje;
 import java.util.List;
 
+/**
+ * <h1>ChatAdapter</h1>
+ * <p>
+ * Adaptador para la lista de mensajes del chat.
+ * Maneja dos tipos de vistas diferentes: Mensajes enviados (Usuario) y Mensajes
+ * recibidos (Soporte).
+ * </p>
+ */
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    // Constantes para identificar el tipo de vista
     private static final int VIEW_TYPE_SENT = 1;
     private static final int VIEW_TYPE_RECEIVED = 2;
 
@@ -21,6 +30,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.messageList = messageList;
     }
 
+    /**
+     * Determina el tipo de vista para un elemento en una posición dada.
+     * 
+     * @return VIEW_TYPE_SENT si el mensaje es del usuario, VIEW_TYPE_RECEIVED si es
+     *         del soporte.
+     */
     @Override
     public int getItemViewType(int position) {
         Mensaje message = messageList.get(position);
@@ -31,6 +46,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
+    /**
+     * Crea el ViewHolder correspondiente según el tipo de vista.
+     * Infla layouts diferentes para mensajes enviados y recibidos.
+     */
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -45,6 +64,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
+    /**
+     * Vincula los datos del mensaje con la vista.
+     */
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Mensaje message = messageList.get(position);
@@ -61,7 +83,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return messageList.size();
     }
 
-    // Holders
+    // --- ViewHolders Internos ---
+
+    // ViewHolder para mensajes enviados (Alineados a la derecha)
     private static class SentMessageHolder extends RecyclerView.ViewHolder {
         TextView tvMessage;
 
@@ -75,6 +99,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
+    // ViewHolder para mensajes recibidos (Alineados a la izquierda)
     private static class ReceivedMessageHolder extends RecyclerView.ViewHolder {
         TextView tvMessage;
 

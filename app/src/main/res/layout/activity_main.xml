@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    Layout Principal (MainActivity)
+    Contenedor principal usando ConstraintLayout para posicionamiento flexible.
+-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,7 +12,7 @@
     android:background="@android:color/white"
     tools:context=".MainActivity">
 
-    <!-- Minimalist Header -->
+    <!-- Título de la Aplicación -->
     <TextView
         android:id="@+id/tvAppTitle"
         android:layout_width="wrap_content"
@@ -22,6 +26,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <!-- Botón de Perfil de Usuario -->
     <ImageView
         android:id="@+id/btnProfile"
         android:layout_width="32dp"
@@ -34,7 +39,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:contentDescription="Perfil" />
 
-
+    <!-- Subtítulo Informativo -->
     <TextView
         android:id="@+id/tvSubtitle"
         android:layout_width="wrap_content"
@@ -49,7 +54,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Content List - Direct on background, no Card -->
+    <!-- 
+        Lista de Incidencias (RecyclerView)
+        Ocupa el espacio restante en la pantalla.
+        Tiene padding inferior para evitar que el FAB tape el último elemento.
+    -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="0dp"
@@ -62,7 +71,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Empty State -->
+    <!-- 
+        Estado Vacío (Empty State)
+        Se muestra solo cuando no hay incidencias en la lista.
+    -->
     <LinearLayout
         android:id="@+id/tvEmpty"
         android:layout_width="match_parent"
@@ -98,6 +110,7 @@
             android:layout_marginTop="8dp"/>
     </LinearLayout>
 
+    <!-- Botón Flotante (FAB) para Chat de Soporte -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabChat"
         android:layout_width="wrap_content"
@@ -112,6 +125,7 @@
         app:backgroundTint="@color/white"
         app:elevation="6dp"/>
 
+    <!-- Botón Flotante (FAB) para Añadir Incidencia -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAdd"
         android:layout_width="wrap_content"

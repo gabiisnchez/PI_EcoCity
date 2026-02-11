@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    Item Cabecera de Sección (Expandible)
+    Se utiliza para separar y agrupar incidencias por estado.
+    Permite expandir o colapsar la sección.
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -10,6 +15,7 @@
     android:gravity="center_vertical"
     android:layout_marginTop="8dp">
 
+    <!-- Indicador de Color del Estado -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardStatusColor"
         android:layout_width="4dp"
@@ -18,6 +24,7 @@
         app:cardElevation="0dp"
         app:cardBackgroundColor="@color/colorPrimary"/>
 
+    <!-- Título de la Sección con Contador -->
     <TextView
         android:id="@+id/tvStatusTitle"
         android:layout_width="0dp"
@@ -29,6 +36,7 @@
         android:textColor="#424242"
         android:layout_marginStart="12dp"/>
 
+    <!-- Icono de Expandir/Colapsar -->
     <ImageView
         android:id="@+id/ivExpand"
         android:layout_width="24dp"

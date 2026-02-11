@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    Layout para Añadir/Editar Incidencia
+    Utiliza ScrollView para permitir el desplazamiento en pantallas pequeñas.
+    Contiene campos para título, descripción, selección de urgencia, captura de foto y ubicación.
+-->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
@@ -12,6 +17,7 @@
         android:layout_height="wrap_content"
         android:padding="32dp">
 
+        <!-- Cabecera con Botón Atrás y Título -->
         <LinearLayout
             android:id="@+id/headerLayout"
             android:layout_width="match_parent"
@@ -43,6 +49,7 @@
                 android:textColor="@color/colorPrimary"/>
         </LinearLayout>
 
+        <!-- Formulario de Datos -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -52,6 +59,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/headerLayout">
 
+            <!-- Campo: Título -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -71,6 +79,7 @@
                     android:padding="16dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Campo: Descripción -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -92,6 +101,7 @@
                     android:padding="16dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Selector de Urgencia -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -110,7 +120,7 @@
                 android:minHeight="56dp"
                 android:padding="8dp" />
 
-            <!-- Status Section (Visible only in Edit Mode) -->
+            <!-- Selector de Estado (Visible solo en Edición) -->
             <LinearLayout
                 android:id="@+id/layoutEstado"
                 android:layout_width="match_parent"
@@ -137,7 +147,7 @@
                     android:padding="8dp" />
             </LinearLayout>
 
-            <!-- Multimedia Section -->
+            <!-- Sección Multimedia (Foto) -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -194,7 +204,7 @@
                     android:textColor="@color/white"/>
             </LinearLayout>
 
-            <!-- Location Section -->
+            <!-- Sección Ubicación -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -247,6 +257,7 @@
                     app:backgroundTint="@null" />
             </LinearLayout>
 
+            <!-- Botones de Acción (Guardar / Eliminar) -->
             <Button
                 android:id="@+id/btnSave"
                 android:layout_width="match_parent"

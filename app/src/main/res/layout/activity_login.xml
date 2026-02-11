@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    Layout de Login y Registro
+    Provee una interfaz para que el usuario inicie sesión o se registre.
+    Usa un fondo degradado y una tarjeta central para los campos de entrada.
+-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
@@ -6,7 +11,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_gradient">
 
-    <!-- Header / Logo Area -->
+    <!-- Cabecera con Logo y Título -->
     <LinearLayout
         android:id="@+id/headerContainer"
         android:layout_width="wrap_content"
@@ -47,6 +52,7 @@
             android:letterSpacing="0.1"/>
     </LinearLayout>
 
+    <!-- Tarjeta contenedora del formulario -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardContainer"
         android:layout_width="0dp"
@@ -83,7 +89,7 @@
                     android:textStyle="bold"
                     android:layout_marginBottom="16dp"/>
 
-                <!-- Registration Fields (Initially Hidden) -->
+                <!-- Campos de Registro (Inicialmente Ocultos) -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilName"
                     android:layout_width="match_parent"
@@ -130,6 +136,7 @@
                         android:padding="12dp"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Campo de Email -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilEmail"
                     android:layout_width="match_parent"
@@ -152,6 +159,7 @@
                         android:padding="12dp"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Campo de Contraseña -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilPassword"
                     android:layout_width="match_parent"
@@ -175,6 +183,7 @@
                         android:padding="12dp"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <!-- Botón de Acción (Login / Registro) -->
                 <Button
                     android:id="@+id/btnLogin"
                     android:layout_width="match_parent"
@@ -187,6 +196,7 @@
                     android:padding="12dp"
                     android:elevation="4dp"/>
 
+                <!-- Texto para alternar modo -->
                 <TextView
                     android:id="@+id/tvToggleMode"
                     android:layout_width="wrap_content"

@@ -1,71 +1,124 @@
 package com.ecocity.app.ui;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
-import android.content.Intent;
-import androidx.appcompat.app.AppCompatActivity;
-import android.net.Uri;
-import android.os.Environment;
-import android.provider.MediaStore;
+
 import androidx.activity.result.ActivityResultLauncher;
-import com.google.android.material.textfield.TextInputEditText;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+
+import com.ecocity.app.R;
+import com.ecocity.app.database.IncidenciaDAO;
+import com.ecocity.app.model.Incidencia;
+import com.google.android.material.textfield.TextInputEditText;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import android.widget.ImageView;
-import com.ecocity.app.model.Incidencia;
-import com.ecocity.app.database.IncidenciaDAO;
-import com.ecocity.app.R;
 
 /**
- * Actividad para crear o editar una incidencia.
- * Permite capturar fotos, seleccionar ubicación y guardar los datos en la base de datos local.
- * Implementa lógica en segundo plano para no bloquear la UI durante el guardado.
+ * <h1>AddIncidenciaActivity</h1>
+ * <p>
+ * Clase principal para la gestión de incidencias (Creación y Edición).
+ * Esta actividad permite al usuario interactuar con el sistema para reportar
+ * nuevos problemas
+ * o modificar los existentes.
+ * </p>
+ *
+ * <h2>Funcionalidades Principales:</h2>
+ * <ul>
+ * <li><b>Formulario de Datos:</b> Título, Descripción, Urgencia.</li>
+ * <li><b>Multimedia:</b> Captura de fotos con cámara o selección de
+ * galería.</li>
+ * <li><b>Geolocalización:</b> Selección de ubicación mediante mapa (Google
+ * Maps).</li>
+ * <li><b>Persistencia:</b> Guardado en base de datos SQLite local.</li>
+ * <li><b>Concurrencia:</b> Uso de Hilos (Threads) para operaciones de E/S
+ * (Entrada/Salida).</li>
+ * </ul>
+ *
+ * @author EcoCity Dev Team
+ * @version 1.0
  */
 public class AddIncidenciaActivity extends AppCompatActivity {
 
+    // --- Componentes de la Interfaz de Usuario (UI) ---
+    // Usamos TextInputEditText de Material Design para mejor experiencia de usuario
     private TextInputEditText etTitulo, etDescripcion;
+
+    // Spinners para selección de opciones predefinidas
     private Spinner spinnerUrgencia;
-    private android.widget.LinearLayout layoutEstado;
     private Spinner spinnerEstado;
 
+    // Layout contenedor para el estado (solo visible en modo edición)
+    private android.widget.LinearLayout layoutEstado;
+
+    // TextView para mostrar coordenadas o estado de la ubicación
     private android.widget.TextView tvLocationStatusDetail;
-    private Button btnSave;
-    private Button btnDelete;
 
-    // Multimedia
-    private ImageView ivFoto;
-    private Button btnCamera, btnGallery;
-    private String currentPhotoPath;
-    private Uri currentPhotoUri;
+    // Botones de acción principal
+    private Button btnSave; // Guardar o Actualizar
+    private Button btnDelete; // Eliminar (solo modo edición)
 
-    private IncidenciaDAO incidenciaDAO;
+    // --- Componentes Multimedia ---
+    private ImageView ivFoto; // Vista previa de la imagen
+    private Button btnCamera; // Botón para abrir la cámara
+    private Button btnGallery; // Botón para abrir la galería
+
+    // Variables para gestionar la ruta de la imagen
+    private String currentPhotoPath; // Ruta absoluta del archivo en disco
+    private Uri currentPhotoUri; // URI content:// para compartir con otras apps (Cámara)
+
+    // --- Acceso a Datos (DAO) ---
+    private IncidenciaDAO incidenciaDAO; // Objeto para interactuar con la tabla 'incidencias'
+
+    // Objeto que almacena la incidencia si estamos editando (null si es nueva)
     private Incidencia incidenciaToEdit;
 
-    // Launchers para resultados de actividades (Cámara, Galería, Mapa, Permisos)
-    private ActivityResultLauncher<Uri> cameraLauncher;
-    private ActivityResultLauncher<String> galleryLauncher;
-    private ActivityResultLauncher<Intent> mapLauncher;
-    private ActivityResultLauncher<String> requestCameraPermissionLauncher;
+    // --- Activity Result API Callbacks ---
+    // Reemplazo moderno de startActivityForResult() para manejar respuestas de
+    // otras Actividades
+    private ActivityResultLauncher<Uri> cameraLauncher; // Resultado de la cámara
+    private ActivityResultLauncher<String> galleryLauncher; // Resultado de la galería
+    private ActivityResultLauncher<Intent> mapLauncher; // Resultado del mapa (Coordenadas)
+    private ActivityResultLauncher<String> requestCameraPermissionLauncher; // Resultado de permisos
 
-    // Coordenadas
-    private double currentLat = 0.0;
-    private double currentLng = 0.0;
+    // --- Variables de Estado ---
+    private double currentLat = 0.0; // Latitud seleccionada
+    private double currentLng = 0.0; // Longitud seleccionada
 
+    /**
+     * Método onCreate(): Punto de entrada de la Activity.
+     * Se ejecuta al crear la instancia de la clase.
+     *
+     * @param savedInstanceState Estado previo guardado (si existe) para restaurar
+     *                           la interfaz.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Habilita el diseño de borde a borde (Edge-to-Edge) para pantallas modernas
         androidx.activity.EdgeToEdge.enable(this);
+
+        // Asocia el layout XML a esta actividad java
         setContentView(R.layout.activity_add_incidencia);
+
+        // Ajusta los márgenes para evitar que la UI quede detrás de las barras del
+        // sistema
         androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             androidx.core.graphics.Insets systemBars = insets
                     .getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars());
@@ -73,99 +126,117 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             return insets;
         });
 
+        // --- 1. Inicialización de Vistas (View Binding manual) ---
         etTitulo = findViewById(R.id.etTitulo);
-
-        android.widget.ImageButton btnBack = findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(v -> finish());
-
         etDescripcion = findViewById(R.id.etDescripcion);
         spinnerUrgencia = findViewById(R.id.spinnerUrgencia);
-
         layoutEstado = findViewById(R.id.layoutEstado);
         spinnerEstado = findViewById(R.id.spinnerEstado);
-
         tvLocationStatusDetail = findViewById(R.id.tvLocationStatusDetail);
+
+        // Botón Atrás (Toolbar personalizada)
+        android.widget.ImageButton btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish()); // Cierra la actividad actual
 
         // Vistas Multimedia
         ivFoto = findViewById(R.id.ivFoto);
         btnCamera = findViewById(R.id.btnCamera);
         btnGallery = findViewById(R.id.btnGallery);
 
-        // UI Ubicación
+        // Botón Ubicación
         Button btnAddLocation = findViewById(R.id.btnAddLocation);
         btnAddLocation.setEnabled(true);
 
+        // Botones de Acción
         btnSave = findViewById(R.id.btnSave);
         btnDelete = findViewById(R.id.btnDelete);
 
+        // --- 2. Inicialización de Base de Datos ---
+        // Abrimos la conexión writable con la BD
         incidenciaDAO = new IncidenciaDAO(this);
         incidenciaDAO.open();
 
-        setupLaunchers();
-        setupSpinner();
+        // --- 3. Configuración Inicial ---
+        setupLaunchers(); // Configurar callbacks de resultados
+        setupSpinner(); // Configurar listas desplegables
 
-        // Comprobar si hay extras (Modo Edición)
+        // --- 4. Lógica de Modo Edición vs Creación ---
+        // Verificamos si el Intent trae un objeto 'incidencia'
         if (getIntent().hasExtra("incidencia")) {
+            // MODO EDICIÓN: Recuperamos el objeto serializado
             incidenciaToEdit = (Incidencia) getIntent().getSerializableExtra("incidencia");
-            setupEditMode();
+            setupEditMode(); // Rellenamos el formulario con los datos existentes
         } else {
-            // Por defecto para nueva incidencia
+            // MODO CREACIÓN: Estado inicial por defecto
             tvLocationStatusDetail.setText("Pendiente (Toca 'Añadir Ubicación')");
         }
 
+        // --- 5. Configuración de Listeners (Eventos) ---
+
+        // Botón Cámara: Verificamos permisos antes de intentar abrirla
         btnCamera.setOnClickListener(v -> checkCameraPermissionAndOpen());
 
+        // Botón Galería: Lanzamos selector de contenido tipo imagen
         btnGallery.setOnClickListener(v -> galleryLauncher.launch("image/*"));
 
+        // Botón Mapa: Abrimos MapActivity esperando un resultado
         btnAddLocation.setOnClickListener(v -> {
             Intent intent = new Intent(AddIncidenciaActivity.this, MapActivity.class);
             mapLauncher.launch(intent);
         });
 
+        // Botón Guardar
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveIncidencia();
+                saveIncidencia(); // Llamada al método que valida y guarda
             }
         });
 
+        // Botón Eliminar
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                deleteIncidencia();
+                deleteIncidencia(); // Llamada al método que elimina el registro
             }
         });
     }
 
     /**
-     * Configura los ActivityResultLaunchers para manejar los retornos de:
-     * - Cámara (Foto capturada)
-     * - Galería (Imagen seleccionada)
-     * - Mapa (Ubicación seleccionada)
-     * - Permisos (Solicitud de permiso de cámara)
+     * Inicializa los ActivityResultLaunchers.
+     * Estos objetos manejan las respuestas asíncronas de otras actividades o
+     * diálogos del sistema.
      */
     private void setupLaunchers() {
+        // Callback para la Cámara
         cameraLauncher = registerForActivityResult(
                 new ActivityResultContracts.TakePicture(),
                 success -> {
                     if (success) {
-                        ivFoto.setPadding(0, 0, 0, 0);
-                        ivFoto.setImageURI(currentPhotoUri);
+                        // La foto se guardó exitosamente en 'currentPhotoUri'
+                        ivFoto.setPadding(0, 0, 0, 0); // Ajuste visual
+                        ivFoto.setImageURI(currentPhotoUri); // Mostrar en UI
                     }
                 });
 
+        // Callback para la Galería
         galleryLauncher = registerForActivityResult(
                 new ActivityResultContracts.GetContent(),
                 uri -> {
                     if (uri != null) {
+                        // Usuario seleccionó una imagen
                         ivFoto.setPadding(0, 0, 0, 0);
                         ivFoto.setImageURI(uri);
-                        // Para simplificar en esta demo, guardamos el toString del URI.
-                        // Lo ideal sería copiar el archivo a almacenamiento interno.
+
+                        // Guardamos la URI como cadena.
+                        // IMPORTANTE: En producción, se recomienda copiar el archivo a un directorio
+                        // local de la app
+                        // para garantizar persistencia a largo plazo.
                         currentPhotoPath = uri.toString();
 
                         try {
-                            // Intentar persistir el permiso de lectura del URI
+                            // Solicitamos persistencia de permisos de lectura para la URI
+                            // Esto evita SecurityExceptions al intentar leer la imagen tras reiniciar
                             getContentResolver().takePersistableUriPermission(uri,
                                     Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         } catch (Exception e) {
@@ -174,45 +245,62 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                     }
                 });
 
+        // Callback para el Mapa
         mapLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
+                    // Verificamos que la actividad terminó OK y tiene datos
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        // Extraemos coordenadas del Intent de retorno
                         currentLat = result.getData().getDoubleExtra("lat", 0.0);
                         currentLng = result.getData().getDoubleExtra("lng", 0.0);
 
+                        // Actualizamos UI con feedback visual (Texto y Color)
                         tvLocationStatusDetail.setText("Ubicación Registrada (" + String.format("%.4f", currentLat)
                                 + ", " + String.format("%.4f", currentLng) + ")");
                         tvLocationStatusDetail.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
                     }
                 });
 
+        // Callback para Solicitud de Permisos
         requestCameraPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
                 isGranted -> {
                     if (isGranted) {
+                        // Permiso concedido -> Abrir cámara
                         dispatchTakePictureIntent();
                     } else {
+                        // Permiso denegado -> Explicar al usuario
                         Toast.makeText(this, "Permiso de cámara necesario para tomar fotos", Toast.LENGTH_SHORT)
                                 .show();
                     }
                 });
     }
 
+    /**
+     * Prepara el archivo y lanza la intención de captura de imagen.
+     * Utiliza FileProvider para compartir seguramente el archivo con la app de
+     * cámara externa.
+     */
     private void dispatchTakePictureIntent() {
         File photoFile = null;
         try {
-            photoFile = createImageFile();
+            photoFile = createImageFile(); // Crea el fichero físico temporal
         } catch (IOException ex) {
             Toast.makeText(this, "Error creando archivo para foto", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        // Si el archivo se creó correctamente, procedemos
         if (photoFile != null) {
             try {
+                // Obtener URI segura mediante FileProvider (com.ecocity.app.fileprovider)
+                // Requerido desde Android 7.0 (API 24) para evitar FileUriExposedException
                 currentPhotoUri = FileProvider.getUriForFile(this,
                         "com.ecocity.app.fileprovider",
                         photoFile);
+
+                // Lanzar la actividad de cámara del sistema
                 cameraLauncher.launch(currentPhotoUri);
             } catch (android.content.ActivityNotFoundException e) {
                 Toast.makeText(this, "No se encontró una aplicación de cámara", Toast.LENGTH_SHORT).show();
@@ -223,47 +311,74 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Crea un archivo de imagen temporal con nombre único.
+     * 
+     * @return Archivo File creado en el directorio de imágenes privado de la app.
+     * @throws IOException Si falla la creación del archivo.
+     */
     private File createImageFile() throws IOException {
+        // Generar nombre de archivo único basado en fecha y hora
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
+
+        // Directorio de almacenamiento externo privado de la app (No requiere permiso
+        // WRITE_EXTERNAL_STORAGE en Android 10+)
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
+        // Crear archivo temporal
         File image = File.createTempFile(
                 imageFileName, /* prefix */
                 ".jpg", /* suffix */
                 storageDir /* directory */
         );
+
+        // Guardar ruta absoluta para persistencia en BD
         currentPhotoPath = image.getAbsolutePath();
         return image;
     }
 
+    /**
+     * Configura los adaptadores de datos para los Spinners.
+     */
     private void setupSpinner() {
+        // 1. Spinner Urgencia
         String[] urgencias = { "Baja", "Media", "Alta" };
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, urgencias);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerUrgencia.setAdapter(adapter);
 
-        // Configurar Spinner de Estado
+        // 2. Spinner Estado
         String[] estados = { "Pendiente", "En proceso", "Resuelta" };
         ArrayAdapter<String> adapterEstado = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, estados);
         adapterEstado.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerEstado.setAdapter(adapterEstado);
     }
 
+    /**
+     * Verifica permiso de cámara y actúa segun el estado.
+     */
     private void checkCameraPermissionAndOpen() {
         if (androidx.core.content.ContextCompat.checkSelfPermission(this,
                 android.Manifest.permission.CAMERA) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            // Permiso ya concedido
             dispatchTakePictureIntent();
         } else {
+            // Solicitar permiso
             requestCameraPermissionLauncher.launch(android.Manifest.permission.CAMERA);
         }
     }
 
+    /**
+     * Configura la interfaz con los valores de la incidencia a editar.
+     */
     private void setupEditMode() {
         if (incidenciaToEdit != null) {
+            // Rellenar campos de texto
             etTitulo.setText(incidenciaToEdit.getTitulo());
             etDescripcion.setText(incidenciaToEdit.getDescripcion());
 
-            // Seleccionar Spinner Urgencia
+            // Seleccionar Urgencia
             ArrayAdapter<String> adapter = (ArrayAdapter<String>) spinnerUrgencia.getAdapter();
             int position = adapter.getPosition(incidenciaToEdit.getUrgencia());
             if (position >= 0) {
@@ -278,15 +393,14 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                 spinnerEstado.setSelection(posEstado);
             }
 
-            // Cargar Imagen
+            // Cargar Imagen Previa
             if (incidenciaToEdit.getFotoPath() != null && !incidenciaToEdit.getFotoPath().isEmpty()) {
                 currentPhotoPath = incidenciaToEdit.getFotoPath();
                 try {
-                    // Verificar si es content URI o ruta de archivo
+                    // Gestionar carga según si es Content URI o File Path
                     if (currentPhotoPath.startsWith("content://")) {
                         ivFoto.setImageURI(Uri.parse(currentPhotoPath));
                     } else {
-                        // Asumir ruta absoluta
                         ivFoto.setImageURI(Uri.fromFile(new File(currentPhotoPath)));
                     }
                     ivFoto.setPadding(0, 0, 0, 0);
@@ -295,7 +409,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                 }
             }
 
-            // Estado de Ubicación
+            // Configurar visualización de Ubicación
             if (incidenciaToEdit.getLatitud() != 0.0 || incidenciaToEdit.getLongitud() != 0.0) {
                 currentLat = incidenciaToEdit.getLatitud();
                 currentLng = incidenciaToEdit.getLongitud();
@@ -306,49 +420,62 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                 tvLocationStatusDetail.setText("Pendiente (Toca para añadir)");
             }
 
+            // Cambiar texto de botón para reflejar acción
             btnSave.setText("Actualizar");
             btnDelete.setVisibility(View.VISIBLE);
         }
     }
 
+    /**
+     * Elimina la incidencia de la base de datos.
+     */
     private void deleteIncidencia() {
         if (incidenciaToEdit != null) {
             incidenciaDAO.deleteIncidencia(incidenciaToEdit.getId());
             Toast.makeText(this, "Incidencia eliminada", Toast.LENGTH_SHORT).show();
-            finish();
+            finish(); // Cierra la actividad tras borrar
         }
     }
 
     /**
-     * Guarda la incidencia en la base de datos.
-     * Ejecuta la operación de inserción/actualización en un hilo secundario (Background Thread)
-     * para cumplir con los requisitos de PSP y evitar bloquear la UI.
+     * Guarda o actualiza la incidencia en la Base de Datos.
+     * <p>
+     * <b>ASPECTO CLAVE: Uso de Hilos (Threads)</b><br>
+     * Las operaciones de base de datos son bloqueantes. Para mantener la interfaz
+     * fluida (ANR free),
+     * ejecutamos la inserción/actualización en un hilo separado (Worker Thread).
+     * Luego, usamos runOnUiThread() para volver al hilo principal y mostrar el
+     * resultado.
+     * </p>
      */
     private void saveIncidencia() {
+        // 1. Recoger datos de la UI
         final String titulo = etTitulo.getText().toString().trim();
         final String descripcion = etDescripcion.getText().toString().trim();
         final String urgencia = spinnerUrgencia.getSelectedItem().toString();
 
+        // 2. Validación
         if (TextUtils.isEmpty(titulo) || TextUtils.isEmpty(descripcion)) {
             Toast.makeText(this, R.string.msg_empty_fields, Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Usar ruta guardada o cadena vacía
+        // Datos opcionales
         final String fotoPath = currentPhotoPath != null ? currentPhotoPath : "";
         final String estado = spinnerEstado.getSelectedItem().toString();
 
-        // Deshabilitar botón para evitar múltiples clics
+        // 3. Bloquear UI
         btnSave.setEnabled(false);
 
-        // Requisito PSP: Hilo en segundo plano para operaciones de BBDD/Multimedia
+        // 4. Iniciar Hilo de Trabajo (Worker Thread)
         new Thread(new Runnable() {
             @Override
             public void run() {
                 boolean success = false;
 
+                // Lógica de Negocio: Insertar vs Actualizar
                 if (incidenciaToEdit != null) {
-                    // Actualizar existente
+                    // Update
                     incidenciaToEdit.setTitulo(titulo);
                     incidenciaToEdit.setDescripcion(descripcion);
                     incidenciaToEdit.setUrgencia(urgencia);
@@ -360,11 +487,13 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                     int result = incidenciaDAO.updateIncidencia(incidenciaToEdit);
                     success = (result > 0);
                 } else {
-                    // Crear nueva
-                    Incidencia incidencia = new Incidencia(titulo, descripcion, urgencia, fotoPath, currentLat, currentLng);
+                    // Insert
+                    Incidencia incidencia = new Incidencia(titulo, descripcion, urgencia, fotoPath, currentLat,
+                            currentLng);
 
-                    // Asignar Email de Usuario
-                    com.ecocity.app.utils.SessionManager session = new com.ecocity.app.utils.SessionManager(getApplicationContext());
+                    // Asignar al usuario actual
+                    com.ecocity.app.utils.SessionManager session = new com.ecocity.app.utils.SessionManager(
+                            getApplicationContext());
                     String email = session.getUserDetails().get(com.ecocity.app.utils.SessionManager.KEY_EMAIL);
                     incidencia.setUserEmail(email);
 
@@ -372,31 +501,40 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                     success = (result != -1);
                 }
 
-                // Las actualizaciones de UI deben ser en el Hilo Principal
+                // 5. Volver al Hilo UI para mostrar resultado
                 final boolean finalSuccess = success;
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        btnSave.setEnabled(true); // Reactivar por seguridad flujo
+                        btnSave.setEnabled(true); // Desbloquear UI
+
                         if (finalSuccess) {
-                            Toast.makeText(AddIncidenciaActivity.this, 
-                                    incidenciaToEdit != null ? "Actualizado correctamente" : getString(R.string.msg_saved), 
+                            Toast.makeText(AddIncidenciaActivity.this,
+                                    incidenciaToEdit != null ? "Actualizado correctamente"
+                                            : getString(R.string.msg_saved),
                                     Toast.LENGTH_SHORT).show();
-                            finish();
+                            finish(); // Cerrar Activity
                         } else {
-                            Toast.makeText(AddIncidenciaActivity.this, 
-                                    "Error al guardar incidencia", 
+                            Toast.makeText(AddIncidenciaActivity.this,
+                                    "Error al guardar incidencia",
                                     Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
             }
-        }).start();
+        }).start(); // Arrancar el hilo
     }
 
+    /**
+     * Método onDestroy(): Se llama cuando la actividad se destruye.
+     * Ideal para limpieza de recursos.
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        incidenciaDAO.close();
+        // Cerramos conexión a base de datos para evitar fugas de memoria
+        if (incidenciaDAO != null) {
+            incidenciaDAO.close();
+        }
     }
 }

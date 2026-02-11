@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    Layout de Chat de Soporte (ChatActivity)
+    Interfaz para la comunicación con el soporte técnico.
+    Incluye un RecyclerView para la lista de mensajes y un área de entrada de texto.
+-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
@@ -6,7 +11,7 @@
     android:layout_height="match_parent"
     android:background="#FAFAFA">
 
-    <!-- Header -->
+    <!-- Cabecera del Chat -->
     <LinearLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
@@ -43,6 +48,7 @@
             android:layout_marginStart="16dp"/>
     </LinearLayout>
 
+    <!-- Lista de Mensajes -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvChat"
         android:layout_width="match_parent"
@@ -52,7 +58,7 @@
         app:layout_constraintTop_toBottomOf="@id/header"
         app:layout_constraintBottom_toTopOf="@id/inputArea"/>
 
-    <!-- Input Area -->
+    <!-- Área de Entrada de Mensaje -->
     <LinearLayout
         android:id="@+id/inputArea"
         android:layout_width="match_parent"

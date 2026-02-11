@@ -60,7 +60,7 @@ public class ChatActivity extends AppCompatActivity {
         // Configuración de datos
         messageList = new ArrayList<>();
         // Mensaje de bienvenida inicial
-        messageList.add(new Mensaje("¡Hola! Soy el asistente virtual de EcoCity. ¿En qué puedo ayudarte hoy?", false));
+        messageList.add(new Mensaje(getString(R.string.chat_welcome_message), false));
 
         // Configuración del Adapter y RecyclerView
         adapter = new ChatAdapter(messageList);
@@ -105,7 +105,7 @@ public class ChatActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                String reply = "Gracias por tu mensaje. Un operador revisará tu consulta en breve.";
+                String reply = getString(R.string.chat_auto_reply);
                 messageList.add(new Mensaje(reply, false));
                 adapter.notifyItemInserted(messageList.size() - 1);
                 rvChat.scrollToPosition(messageList.size() - 1);

@@ -41,7 +41,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Soporte Técnico"
+            android:text="@string/chat_title"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@color/black"
@@ -75,7 +75,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/input_field_bg"
-            android:hint="Escribe tu mensaje..."
+            android:hint="@string/chat_hint_message"
             android:padding="12dp"
             android:inputType="textCapSentences|textMultiLine"
             android:maxLines="4"

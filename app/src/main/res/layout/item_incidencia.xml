@@ -102,7 +102,7 @@
                     android:id="@+id/tvLocationStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ubicación registrada"
+                    android:text="@string/item_location_registered"
                     android:textSize="12sp"
                     android:textColor="@color/colorPrimary"
                     android:textStyle="bold"

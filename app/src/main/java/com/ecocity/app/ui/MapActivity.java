@@ -208,7 +208,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private void searchLocation() {
         String location = etSearch.getText().toString();
         if (location == null || location.equals("")) {
-            Toast.makeText(this, "Introduce una dirección", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.map_msg_enter_address), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -230,11 +230,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     imm.hideSoftInputFromWindow(etSearch.getWindowToken(), 0);
                 }
             } else {
-                Toast.makeText(this, "No se encontró la ubicación", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.map_msg_not_found), Toast.LENGTH_SHORT).show();
             }
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(this, "Error de red o servicio", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.map_msg_error), Toast.LENGTH_SHORT).show();
         }
     }
 }

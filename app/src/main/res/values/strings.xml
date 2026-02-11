@@ -4,24 +4,99 @@
         Centraliza todos los textos visibles en la aplicación.
         Facilita la traducción (internacionalización) y el mantenimiento.
     -->
+    <!-- Textos Genéricos -->
     <string name="app_name">EcoCity</string>
-    
+    <string name="app_title">Ciudad Inteligente</string>
+    <string name="btn_save">Guardar Incidencia</string>
+    <string name="btn_delete">Eliminar</string>
+    <string name="btn_update">Actualizar</string>
+    <string name="btn_cancel">Cancelar</string>
+    <string name="btn_back">Atrás</string>
+
     <!-- Login y Registro -->
+    <string name="title_welcome">Bienvenido</string>
+    <string name="title_create_account">Crear Cuenta</string>
+    <string name="hint_name">Nombre</string>
+    <string name="hint_surnames">Apellidos</string>
     <string name="hint_email">Correo Electrónico</string>
     <string name="hint_password">Contraseña</string>
     <string name="btn_login">Iniciar Sesión</string>
-    
-    <!-- Gestión de Incidencias -->
+    <string name="btn_register">Registrarse</string>
+    <string name="text_no_account">¿No tienes cuenta? Registrate aquí</string>
+    <string name="text_has_account">¿Ya tienes cuenta? Inicia Sesión</string>
+    <string name="error_email_required">El correo es requerido</string>
+    <string name="error_email_invalid">Correo inválido</string>
+    <string name="error_password_required">La contraseña es requerida</string>
+    <string name="error_name_required">El nombre es requerido</string>
+    <string name="error_surnames_required">Los apellidos son requeridos</string>
+    <string name="error_email_exists">El correo ya está registrado</string>
+    <string name="error_auth_failed">Correo o contraseña incorrectos</string>
+    <string name="msg_register_success">Registro exitoso. Por favor inicia sesión.</string>
+    <string name="msg_register_error">Error en el registro</string>
+
+    <!-- Pantalla Principal (MainActivity) -->
+    <string name="subtitle_incidencia">INCIDENCIAS</string>
+    <string name="empty_state_title">Sin incidencias</string>
+    <string name="empty_state_desc">Tu lista está vacía y limpia</string>
+    <string name="content_desc_profile">Perfil</string>
+    <string name="content_desc_support">Soporte</string>
+    <string name="content_desc_add">Añadir Incidencia</string>
+
+    <!-- Gestión de Incidencias (Add/Edit) -->
+    <string name="title_activity_add_incidencia">Nueva Incidencia</string>
     <string name="hint_title">Título de la incidencia</string>
     <string name="hint_description">Descripción del problema</string>
     <string name="label_urgency">Nivel de Urgencia</string>
-    <string name="btn_save">Guardar Incidencia</string>
-    <string name="title_activity_add_incidencia">Nueva Incidencia</string>
+    <string name="label_status">Estado de la incidencia</string>
+    <string name="text_location_pending">Pendiente (Toca para añadir)</string>
+    <string name="text_location_registered">Ubicación Registrada (%1$s, %2$s)</string>
     <string name="msg_empty_fields">Por favor complete todos los campos</string>
     <string name="msg_saved">Incidencia guardada correctamente</string>
-    <string name="subtitle_incidencia">INCIDENCIAS</string>
-    <string name="add_ubi">Añadir Ubicación</string>
-    <string name="waiting_ubi">Pendiente (Se podrá añadir tras guardar)</string>
-    <string name="ubi">Ubicación</string>
-    <string name="btn_delete">Eliminar</string>
+    <string name="msg_updated">Actualizada correctamente</string>
+    <string name="msg_deleted">Incidencia eliminada</string>
+    <string name="msg_error_save">Error al guardar incidencia</string>
+    <string name="msg_camera_permission">Permiso de cámara necesario para tomar fotos</string>
+    <string name="msg_no_camera_app">No se encontró una aplicación de cámara</string>
+    <string name="msg_error_camera_file">Error creando archivo para foto</string>
+    <string name="btn_add_location">Añadir Ubicación</string>
+    <string name="label_location">Ubicación</string>
+    <string name="label_multimedia">Multimedia</string>
+    <string name="btn_camera">Cámara</string>
+    <string name="btn_gallery">Galería</string>
+    <string name="item_location_registered">Ubicación registrada</string>
+
+    <!-- Detalle de Incidencia -->
+    <string name="detail_unknown_user">Desconocido</string>
+    <string name="detail_no_location">Sin ubicación</string>
+    <string name="detail_location_title">Ubicación Registrada\nLat: %1$s, Lon: %2$s</string>
+
+    <!-- Mapa -->
+    <string name="map_search_hint">Buscar dirección...</string>
+    <string name="map_btn_confirm">Confirmar Ubicación</string>
+    <string name="map_msg_enter_address">Introduce una dirección</string>
+    <string name="map_msg_not_found">No se encontró la ubicación</string>
+    <string name="map_msg_error">Error de red o servicio</string>
+
+    <!-- Perfil -->
+    <string name="profile_title">Perfil de Usuario</string>
+    <string name="profile_stats_total">Total Incidencias</string>
+    <string name="profile_stats_resolved">Resueltas</string>
+    <string name="profile_stats_process">En Proceso</string>
+    <string name="profile_stats_pending">Pendientes</string>
+    <string name="btn_logout">Cerrar Sesión</string>
+    
+    <!-- Chat -->
+    <string name="chat_title">Soporte EcoCity</string>
+    <string name="chat_hint_message">Escribe un mensaje...</string>
+    <string name="chat_welcome_message">¡Hola! Soy el asistente virtual de EcoCity. ¿En qué puedo ayudarte hoy?</string>
+    <string name="chat_auto_reply">Gracias por tu mensaje. Un operador revisará tu consulta en breve.</string>
+
+    <!-- Valores de Listas (Arrays) -->
+    <string name="urgency_low">Baja</string>
+    <string name="urgency_medium">Media</string>
+    <string name="urgency_high">Alta</string>
+    
+    <string name="status_pending">Pendiente</string>
+    <string name="status_in_process">En proceso</string>
+    <string name="status_resolved">Resuelta</string>
 </resources>

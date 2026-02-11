@@ -168,7 +168,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             setupEditMode(); // Rellenamos el formulario con los datos existentes
         } else {
             // MODO CREACIÓN: Estado inicial por defecto
-            tvLocationStatusDetail.setText("Pendiente (Toca 'Añadir Ubicación')");
+            tvLocationStatusDetail.setText(getString(R.string.text_location_pending));
         }
 
         // --- 5. Configuración de Listeners (Eventos) ---
@@ -256,8 +256,8 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                         currentLng = result.getData().getDoubleExtra("lng", 0.0);
 
                         // Actualizamos UI con feedback visual (Texto y Color)
-                        tvLocationStatusDetail.setText("Ubicación Registrada (" + String.format("%.4f", currentLat)
-                                + ", " + String.format("%.4f", currentLng) + ")");
+                        tvLocationStatusDetail.setText(String.format(getString(R.string.text_location_registered),
+                                String.format("%.4f", currentLat), String.format("%.4f", currentLng)));
                         tvLocationStatusDetail.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
                     }
                 });
@@ -271,7 +271,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                         dispatchTakePictureIntent();
                     } else {
                         // Permiso denegado -> Explicar al usuario
-                        Toast.makeText(this, "Permiso de cámara necesario para tomar fotos", Toast.LENGTH_SHORT)
+                        Toast.makeText(this, getString(R.string.msg_camera_permission), Toast.LENGTH_SHORT)
                                 .show();
                     }
                 });
@@ -287,7 +287,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         try {
             photoFile = createImageFile(); // Crea el fichero físico temporal
         } catch (IOException ex) {
-            Toast.makeText(this, "Error creando archivo para foto", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.msg_error_camera_file), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -303,7 +303,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                 // Lanzar la actividad de cámara del sistema
                 cameraLauncher.launch(currentPhotoUri);
             } catch (android.content.ActivityNotFoundException e) {
-                Toast.makeText(this, "No se encontró una aplicación de cámara", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.msg_no_camera_app), Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
                 Toast.makeText(this, "Error reservando cámara: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 e.printStackTrace();
@@ -343,13 +343,15 @@ public class AddIncidenciaActivity extends AppCompatActivity {
      */
     private void setupSpinner() {
         // 1. Spinner Urgencia
-        String[] urgencias = { "Baja", "Media", "Alta" };
+        String[] urgencias = { getString(R.string.urgency_low), getString(R.string.urgency_medium),
+                getString(R.string.urgency_high) };
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, urgencias);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerUrgencia.setAdapter(adapter);
 
         // 2. Spinner Estado
-        String[] estados = { "Pendiente", "En proceso", "Resuelta" };
+        String[] estados = { getString(R.string.status_pending), getString(R.string.status_in_process),
+                getString(R.string.status_resolved) };
         ArrayAdapter<String> adapterEstado = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, estados);
         adapterEstado.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerEstado.setAdapter(adapterEstado);
@@ -413,15 +415,15 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             if (incidenciaToEdit.getLatitud() != 0.0 || incidenciaToEdit.getLongitud() != 0.0) {
                 currentLat = incidenciaToEdit.getLatitud();
                 currentLng = incidenciaToEdit.getLongitud();
-                tvLocationStatusDetail.setText("Ubicación Registrada (" + String.format("%.4f", currentLat) + ", "
-                        + String.format("%.4f", currentLng) + ")");
+                tvLocationStatusDetail.setText(String.format(getString(R.string.text_location_registered),
+                        String.format("%.4f", currentLat), String.format("%.4f", currentLng)));
                 tvLocationStatusDetail.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
             } else {
-                tvLocationStatusDetail.setText("Pendiente (Toca para añadir)");
+                tvLocationStatusDetail.setText(getString(R.string.text_location_pending));
             }
 
             // Cambiar texto de botón para reflejar acción
-            btnSave.setText("Actualizar");
+            btnSave.setText(getString(R.string.btn_update));
             btnDelete.setVisibility(View.VISIBLE);
         }
     }
@@ -432,7 +434,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
     private void deleteIncidencia() {
         if (incidenciaToEdit != null) {
             incidenciaDAO.deleteIncidencia(incidenciaToEdit.getId());
-            Toast.makeText(this, "Incidencia eliminada", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.msg_deleted), Toast.LENGTH_SHORT).show();
             finish(); // Cierra la actividad tras borrar
         }
     }
@@ -510,13 +512,13 @@ public class AddIncidenciaActivity extends AppCompatActivity {
 
                         if (finalSuccess) {
                             Toast.makeText(AddIncidenciaActivity.this,
-                                    incidenciaToEdit != null ? "Actualizado correctamente"
+                                    incidenciaToEdit != null ? getString(R.string.msg_updated)
                                             : getString(R.string.msg_saved),
                                     Toast.LENGTH_SHORT).show();
                             finish(); // Cerrar Activity
                         } else {
                             Toast.makeText(AddIncidenciaActivity.this,
-                                    "Error al guardar incidencia",
+                                    getString(R.string.msg_error_save),
                                     Toast.LENGTH_SHORT).show();
                         }
                     }

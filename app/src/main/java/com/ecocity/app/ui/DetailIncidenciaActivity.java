@@ -158,9 +158,11 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
         if (incidencia.getUserEmail() != null && !incidencia.getUserEmail().isEmpty()) {
             tvUserEmail.setText(incidencia.getUserEmail());
         } else {
-            tvUserEmail.setText("Desconocido");
+            tvUserEmail.setText(getString(R.string.detail_unknown_user));
         }
     }
+
+    // ...
 
     /**
      * Configura el indicador visual de Urgencia (Color y Texto).
@@ -223,9 +225,8 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
     private void setupLocation() {
         if (incidencia.getLatitud() != 0.0 || incidencia.getLongitud() != 0.0) {
             // Mostrar coordenadas
-            tvLocationText.setText(
-                    "Ubicación Registrada\nLat: " + String.format("%.4f", incidencia.getLatitud()) + ", Lon: "
-                            + String.format("%.4f", incidencia.getLongitud()));
+            tvLocationText.setText(String.format(getString(R.string.detail_location_title),
+                    String.format("%.4f", incidencia.getLatitud()), String.format("%.4f", incidencia.getLongitud())));
             tvLocationText.setTextColor(Color.parseColor("#2E7D32"));
 
             // Mostrar Mapa
@@ -235,7 +236,8 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
                 public void onMapReady(GoogleMap googleMap) {
                     // Mover cámara y añadir marcador
                     LatLng location = new LatLng(incidencia.getLatitud(), incidencia.getLongitud());
-                    googleMap.addMarker(new MarkerOptions().position(location).title("Incidencia"));
+                    googleMap.addMarker(
+                            new MarkerOptions().position(location).title(getString(R.string.subtitle_incidencia)));
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f));
 
                     // Desactivar herramientas de mapa para modo "Lite"
@@ -244,7 +246,7 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
             });
         } else {
             // Ocultar mapa si no hay coordenadas
-            tvLocationText.setText("Sin ubicación");
+            tvLocationText.setText(getString(R.string.detail_no_location));
             tvLocationText.setTextColor(Color.parseColor("#757575"));
             mapView.setVisibility(View.GONE);
         }

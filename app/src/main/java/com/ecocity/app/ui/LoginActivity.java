@@ -158,18 +158,18 @@ public class LoginActivity extends AppCompatActivity {
 
         if (isLoginMode) {
             // Configuración visual para Login
-            tvTitle.setText("Bienvenido");
+            tvTitle.setText(getString(R.string.title_welcome));
             btnLogin.setText(getString(R.string.btn_login));
-            tvToggleMode.setText("¿No tienes cuenta? Registrate aquí");
+            tvToggleMode.setText(getString(R.string.text_no_account));
 
             // Ocultar campos innecesarios para Login (Nombre y Apellidos)
             tilName.setVisibility(View.GONE);
             tilSurnames.setVisibility(View.GONE);
         } else {
             // Configuración visual para Registro
-            tvTitle.setText("Crear Cuenta");
-            btnLogin.setText("Registrarse");
-            tvToggleMode.setText("¿Ya tienes cuenta? Inicia Sesión");
+            tvTitle.setText(getString(R.string.title_create_account));
+            btnLogin.setText(getString(R.string.btn_register));
+            tvToggleMode.setText(getString(R.string.text_has_account));
 
             // Mostrar campos adicionales necesarios para Registro
             tilName.setVisibility(View.VISIBLE);
@@ -189,7 +189,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // 1. Validar Email vacio
         if (TextUtils.isEmpty(email)) {
-            tilEmail.setError("El correo es requerido");
+            tilEmail.setError(getString(R.string.error_email_required));
             return false;
         } else {
             tilEmail.setError(null);
@@ -197,7 +197,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // 2. Validar Formato Email (usando Regex de Android)
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            tilEmail.setError("Correo inválido");
+            tilEmail.setError(getString(R.string.error_email_invalid));
             return false;
         } else {
             tilEmail.setError(null);
@@ -205,7 +205,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // 3. Validar Contraseña vacía
         if (TextUtils.isEmpty(password)) {
-            tilPassword.setError("La contraseña es requerida");
+            tilPassword.setError(getString(R.string.error_password_required));
             return false;
         } else {
             tilPassword.setError(null);
@@ -217,14 +217,14 @@ public class LoginActivity extends AppCompatActivity {
             String surnames = etSurnames.getText().toString().trim();
 
             if (TextUtils.isEmpty(name)) {
-                tilName.setError("El nombre es requerido");
+                tilName.setError(getString(R.string.error_name_required));
                 return false;
             } else {
                 tilName.setError(null);
             }
 
             if (TextUtils.isEmpty(surnames)) {
-                tilSurnames.setError("Los apellidos son requeridos");
+                tilSurnames.setError(getString(R.string.error_surnames_required));
                 return false;
             } else {
                 tilSurnames.setError(null);
@@ -258,9 +258,9 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             // Login Fallido: Mostrar error visual
             tilEmail.setError(" ");
-            tilPassword.setError("Correo o contraseña incorrectos");
+            tilPassword.setError(getString(R.string.error_auth_failed));
             etPassword.requestFocus();
-            Toast.makeText(this, "Error de autenticación", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.error_auth_failed), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -275,7 +275,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // 1. Verificar si el email ya existe en la BD
         if (userDAO.checkEmailExists(email)) {
-            tilEmail.setError("El correo ya está registrado");
+            tilEmail.setError(getString(R.string.error_email_exists));
             return;
         }
 
@@ -285,7 +285,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if (result > 0) {
             // Registro Exitoso
-            Toast.makeText(this, "Registro exitoso. Por favor inicia sesión.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.msg_register_success), Toast.LENGTH_SHORT).show();
 
             // Limpiar campos y cambiar a modo Login automáticamente para que el usuario
             // entre
@@ -297,7 +297,7 @@ public class LoginActivity extends AppCompatActivity {
             toggleMode();
         } else {
             // Error en Registro (ej: fallo de escritura en BBDD)
-            Toast.makeText(this, "Error en el registro", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.msg_register_error), Toast.LENGTH_SHORT).show();
         }
     }
 

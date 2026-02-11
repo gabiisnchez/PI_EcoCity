@@ -1,20 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    Manifiesto de la Aplicación (AndroidManifest.xml)
+    Describe la información esencial de la app para las herramientas de construcción de Android,
+    el sistema operativo Android y Google Play.
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permisos solicitados al sistema -->
+    <!-- Cámara: Para tomar fotos de incidencias -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-permission android:name="android.permission.CAMERA" />
+    
+    <!-- Ubicación: Para geolocalizar las incidencias (Fina y Aproximada) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-
+    <!-- Queries para interactuar con otras apps (ej. Cámara) -->
     <queries>
         <intent>
             <action android:name="android.media.action.IMAGE_CAPTURE" />
         </intent>
     </queries>
 
+    <!-- Configuración de la Aplicación -->
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -25,10 +34,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EcoCity">
 
+        <!-- Clave API de Google Maps -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDMpZ3nZMQSOaWo5zapeRvx07wsNn0Ui9I"/>
 
+        <!-- Proveedor de Archivos para compartir fotos con la cámara -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.ecocity.app.fileprovider"
@@ -38,6 +49,10 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+        
+        <!-- Actividades (Pantallas) de la Aplicación -->
+        
+        <!-- LoginActivity: Pantalla de inicio (Launcher) -->
         <activity
             android:name=".ui.LoginActivity"
             android:exported="true"
@@ -48,15 +63,26 @@
             </intent-filter>
         </activity>
 
+        <!-- Actividad Principal (Lista de Incidencias) -->
         <activity android:name=".MainActivity" android:exported="false"/>
+        
+        <!-- Añadir/Editar Incidencia -->
         <activity
             android:name=".ui.AddIncidenciaActivity"
             android:exported="false"
             android:label="@string/title_activity_add_incidencia"
             android:windowSoftInputMode="adjustResize" />
+            
+        <!-- Detalle de Incidencia -->
         <activity android:name=".ui.DetailIncidenciaActivity" android:exported="false" android:label="Detalle Incidencia"/>
+        
+        <!-- Chat de Soporte -->
         <activity android:name=".ui.ChatActivity" android:exported="false" android:label="Soporte Técnico" android:windowSoftInputMode="adjustResize"/>
+        
+        <!-- Selección de Ubicación en Mapa -->
         <activity android:name=".ui.MapActivity" android:exported="false" android:label="Seleccionar Ubicación"/>
+        
+        <!-- Perfil de Usuario -->
         <activity android:name=".ui.ProfileActivity" android:exported="false" android:label="Mi Perfil"/>
     </application>
 

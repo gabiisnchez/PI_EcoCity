@@ -1,5 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- 
+        Tema Base de la Aplicación (themes.xml)
+        Define el estilo visual global, heredando de Material Design 3.
+        Se usa 'NoActionBar' porque definimos nuestras propias cabeceras en los layouts.
+    -->
     <style name="Base.Theme.EcoCity" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->

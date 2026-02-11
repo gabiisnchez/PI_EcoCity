@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    Fondo Circular Blanco (circle_background.xml)
+    Forma ovalada simple con relleno blanco.
+    Utilizada como fondo para iconos o avatares.
+-->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="oval">
     <solid android:color="@android:color/white"/>

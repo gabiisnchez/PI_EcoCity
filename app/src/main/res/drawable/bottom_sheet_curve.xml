@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    Fondo Curvo Superior (bottom_sheet_curve.xml)
+    Crea un efecto de "tarjeta deslizante" con esquinas superiores redondeadas.
+    Se usa en superposiciones para suavizar la transición entre el fondo y el contenido.
+-->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">

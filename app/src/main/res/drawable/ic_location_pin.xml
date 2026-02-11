@@ -1,3 +1,7 @@
+<!-- 
+    Icono Pin de Ubicación (ic_location_pin.xml)
+    Vector asset utilizado en el mapa para señalar una ubicación.
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"

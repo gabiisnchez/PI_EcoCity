@@ -1,8 +1,17 @@
 <resources>
+    <!-- 
+        Recursos de Texto (strings.xml)
+        Centraliza todos los textos visibles en la aplicación.
+        Facilita la traducción (internacionalización) y el mantenimiento.
+    -->
     <string name="app_name">EcoCity</string>
+    
+    <!-- Login y Registro -->
     <string name="hint_email">Correo Electrónico</string>
     <string name="hint_password">Contraseña</string>
     <string name="btn_login">Iniciar Sesión</string>
+    
+    <!-- Gestión de Incidencias -->
     <string name="hint_title">Título de la incidencia</string>
     <string name="hint_description">Descripción del problema</string>
     <string name="label_urgency">Nivel de Urgencia</string>

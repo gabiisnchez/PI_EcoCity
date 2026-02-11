@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    Botón Redondeado Acento (button_rounded2.xml)
+    Variante del botón redondeado que utiliza el color de acento.
+    Para acciones secundarias o destacadas pero no principales.
+-->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <corners android:radius="24dp" />

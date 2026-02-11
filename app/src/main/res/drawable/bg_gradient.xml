@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    Fondo Degradado (bg_gradient.xml)
+    Un degradado lineal de tres colores (verde oscuro a verde claro).
+    Utilizado en cabeceras y fondos para dar identidad de marca.
+-->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <gradient

@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    Definición de Colores (colors.xml)
+    Define la paleta de colores utilizada en toda la aplicación.
+    Incluye colores de marca (principales), de acento, de fondo y semánticos (urgencia).
+-->
 <resources>
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
@@ -9,15 +14,19 @@
     <color name="white">#FFFFFFFF</color>
     
     <!-- EcoCity Premium Palette -->
+    <!-- Colores Principales: Verde Naturaleza -->
     <color name="colorPrimary">#2E7D32</color> <!-- Deep Nature Green -->
     <color name="colorPrimaryDark">#1B5E20</color> <!-- Forest Green -->
     <color name="colorAccent">#8BC34A</color> <!-- Fresh Leaf -->
+    
+    <!-- Colores de Fondo y Texto -->
     <color name="colorBackground">#F5F5F5</color> <!-- Off White -->
     <color name="colorSurface">#FFFFFF</color> <!-- White Surface -->
     <color name="colorTextPrimary">#212121</color> <!-- Near Black -->
     <color name="colorTextSecondary">#757575</color> <!-- Grey -->
     <color name="colorError">#B00020</color>
     
+    <!-- Niveles de Urgencia -->
     <color name="urgency_high">#E53935</color>
     <color name="urgency_medium">#FFB300</color>
     <color name="urgency_low">#43A047</color>

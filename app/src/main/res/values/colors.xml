@@ -30,4 +30,31 @@
     <color name="urgency_high">#E53935</color>
     <color name="urgency_medium">#FFB300</color>
     <color name="urgency_low">#43A047</color>
+    
+    <color name="urgency_high_bg">#FFEBEE</color>
+    <color name="urgency_medium_bg">#FFF8E1</color>
+    <color name="urgency_low_bg">#E8F5E9</color>
+
+    <!-- Semantic Colors -->
+    <color name="colorBackgroundLight">#FAFAFA</color>
+    <color name="colorSurfaceVariant">#F5F5F5</color>
+    
+    <color name="colorIconTint">#757575</color>
+    <color name="colorIconInactive">#BDBDBD</color>
+
+    <!-- Chat Colors -->
+    <color name="colorMessageSentBg">#E0F2F1</color>
+    <color name="colorMessageSentText">#004D40</color>
+    <color name="colorMessageReceivedBg">#F5F5F5</color>
+    <color name="colorMessageReceivedText">#424242</color>
+
+    <!-- Profile Stats Colors -->
+    <color name="colorStatTotalBg">#E1F5FE</color>
+    <color name="colorStatTotalText">#0277BD</color>
+    <color name="colorStatResolvedBg">#E8F5E9</color>
+    <color name="colorStatResolvedText">#2E7D32</color>
+    <color name="colorStatProcessBg">#FFF3E0</color>
+    <color name="colorStatProcessText">#EF6C00</color>
+    <color name="colorStatPendingBg">#FAFAFA</color>
+    <color name="colorStatPendingText">#757575</color>
 </resources>

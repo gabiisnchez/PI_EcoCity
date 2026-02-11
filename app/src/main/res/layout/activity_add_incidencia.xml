@@ -70,7 +70,7 @@
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeColor="#424242">
+                app:boxStrokeColor="@color/colorTextPrimary">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etTitulo"
@@ -90,7 +90,7 @@
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeColor="#424242">
+                app:boxStrokeColor="@color/colorTextPrimary">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etDescripcion"
@@ -163,7 +163,7 @@
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="#F5F5F5">
+                app:cardBackgroundColor="@color/colorSurfaceVariant">
 
                 <ImageView
                     android:id="@+id/ivFoto"
@@ -171,7 +171,7 @@
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
                     android:src="@android:drawable/ic_menu_camera"
-                    app:tint="#BDBDBD"
+                    app:tint="@color/colorIconInactive"
                     android:padding="60dp"/>
             </androidx.cardview.widget.CardView>
 
@@ -233,7 +233,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@android:drawable/ic_menu_myplaces"
-                        app:tint="#757575" />
+                        app:tint="@color/colorIconTint" />
 
                     <TextView
                         android:id="@+id/tvLocationStatusDetail"
@@ -241,7 +241,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:text="@string/text_location_pending"
-                        android:textColor="#757575"
+                        android:textColor="@color/colorIconTint"
                         android:textSize="14sp" />
                 </LinearLayout>
 

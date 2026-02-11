@@ -46,7 +46,7 @@
         android:layout_height="wrap_content"
         android:text="@string/subtitle_incidencia"
         android:textSize="16sp"
-        android:textColor="#757575"
+        android:textColor="@color/colorTextSecondary"
         android:letterSpacing="0.15"
         android:textAllCaps="true"
         android:layout_marginTop="4dp"
@@ -90,7 +90,7 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:src="@android:drawable/ic_menu_report_image"
-            app:tint="#E0E0E0"/>
+            app:tint="@color/colorIconInactive"/>
         
         <TextView
             android:layout_width="wrap_content"
@@ -98,7 +98,7 @@
             android:text="@string/empty_state_title"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="#424242"
+            android:textColor="@color/colorTextPrimary"
             android:layout_marginTop="24dp"/>
             
         <TextView
@@ -106,7 +106,7 @@
             android:layout_height="wrap_content"
             android:text="@string/empty_state_desc"
             android:textSize="16sp"
-            android:textColor="#9E9E9E"
+            android:textColor="@color/colorTextSecondary"
             android:layout_marginTop="8dp"/>
     </LinearLayout>
 

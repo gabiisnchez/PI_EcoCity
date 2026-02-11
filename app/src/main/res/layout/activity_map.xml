@@ -73,7 +73,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:src="@drawable/ic_location_pin"
-        app:tint="#D32F2F"
+        app:tint="@color/urgency_high"
         android:layout_marginBottom="24dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

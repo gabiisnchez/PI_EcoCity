@@ -316,33 +316,47 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             // 1. Color según Urgencia
             int urgencyColor;
+            int urgencyBgColor;
             String urgencia = incidencia.getUrgencia() != null ? incidencia.getUrgencia() : "Baja";
 
             switch (urgencia.toLowerCase()) {
                 case "alta":
-                    urgencyColor = Color.parseColor("#E53935"); // Rojo
+                    urgencyColor = androidx.core.content.ContextCompat.getColor(itemView.getContext(),
+                            R.color.urgency_high);
+                    urgencyBgColor = androidx.core.content.ContextCompat.getColor(itemView.getContext(),
+                            R.color.urgency_high_bg);
                     break;
                 case "media":
-                    urgencyColor = Color.parseColor("#FFB300"); // Ámbar
+                    urgencyColor = androidx.core.content.ContextCompat.getColor(itemView.getContext(),
+                            R.color.urgency_medium);
+                    urgencyBgColor = androidx.core.content.ContextCompat.getColor(itemView.getContext(),
+                            R.color.urgency_medium_bg);
                     break;
                 default:
-                    urgencyColor = Color.parseColor("#43A047"); // Verde
+                    urgencyColor = androidx.core.content.ContextCompat.getColor(itemView.getContext(),
+                            R.color.urgency_low);
+                    urgencyBgColor = androidx.core.content.ContextCompat.getColor(itemView.getContext(),
+                            R.color.urgency_low_bg);
                     break;
             }
 
             statusBar.setBackgroundColor(urgencyColor);
-            chipUrgencia.setCardBackgroundColor(Color.parseColor("#F5F5F5"));
+            chipUrgencia.setCardBackgroundColor(urgencyBgColor);
             tvUrgencia.setTextColor(urgencyColor);
 
             // 2. Indicador de Ubicación
             if (incidencia.getLatitud() != 0.0 || incidencia.getLongitud() != 0.0) {
                 tvLocationStatus.setText("Ubicación registrada");
-                tvLocationStatus.setTextColor(Color.parseColor("#2E7D32"));
-                ivLocationIcon.setColorFilter(Color.parseColor("#2E7D32"));
+                int colorGreen = androidx.core.content.ContextCompat.getColor(itemView.getContext(),
+                        R.color.urgency_low);
+                tvLocationStatus.setTextColor(colorGreen);
+                ivLocationIcon.setColorFilter(colorGreen);
             } else {
                 tvLocationStatus.setText("Ubicación pendiente");
-                tvLocationStatus.setTextColor(Color.parseColor("#FF9800"));
-                ivLocationIcon.setColorFilter(Color.parseColor("#FF9800"));
+                int colorOrange = androidx.core.content.ContextCompat.getColor(itemView.getContext(),
+                        R.color.urgency_medium);
+                tvLocationStatus.setTextColor(colorOrange);
+                ivLocationIcon.setColorFilter(colorOrange);
             }
 
             // 3. Estilos según Estado
@@ -352,16 +366,22 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             String estado = incidencia.getEstado() != null ? incidencia.getEstado() : "Pendiente";
 
             if (estado.equalsIgnoreCase("En proceso")) {
-                statusBgColor = Color.parseColor("#E3F2FD");
-                statusTextColor = Color.parseColor("#1976D2");
+                statusBgColor = androidx.core.content.ContextCompat.getColor(itemView.getContext(),
+                        R.color.colorStatProcessBg);
+                statusTextColor = androidx.core.content.ContextCompat.getColor(itemView.getContext(),
+                        R.color.colorStatProcessText);
                 statusIconRes = android.R.drawable.ic_popup_sync;
             } else if (estado.equalsIgnoreCase("Resuelta")) {
-                statusBgColor = Color.parseColor("#E8F5E9");
-                statusTextColor = Color.parseColor("#388E3C");
+                statusBgColor = androidx.core.content.ContextCompat.getColor(itemView.getContext(),
+                        R.color.colorStatResolvedBg);
+                statusTextColor = androidx.core.content.ContextCompat.getColor(itemView.getContext(),
+                        R.color.colorStatResolvedText);
                 statusIconRes = R.drawable.ic_check; // Se asume existencia de recurso o drawable
             } else {
-                statusBgColor = Color.parseColor("#EEEEEE");
-                statusTextColor = Color.parseColor("#616161");
+                statusBgColor = androidx.core.content.ContextCompat.getColor(itemView.getContext(),
+                        R.color.colorStatPendingBg);
+                statusTextColor = androidx.core.content.ContextCompat.getColor(itemView.getContext(),
+                        R.color.colorStatPendingText);
                 statusIconRes = android.R.drawable.ic_menu_help;
             }
 

@@ -51,13 +51,52 @@
                     android:maxLines="1"
                     android:ellipsize="end"/>
 
+                <!-- Contenedor Derecho (Estado y Fecha) -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="end">
+
+                    <!-- Chip de Estado -->
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cardStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="@color/colorSurfaceVariant">
+
+                        <TextView
+                            android:id="@+id/tvStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Pendiente"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="4dp"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorTextSecondary"/>
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Fecha -->
+                    <TextView
+                        android:id="@+id/tvDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="12 Oct 2023"
+                        android:textSize="12sp"
+                        android:layout_marginTop="8dp"
+                        android:textColor="@color/colorTextSecondary"/>
+                </LinearLayout>
+
                 <!-- Chip de Urgencia Minimalista -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/chipUrgencia"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:cardCornerRadius="8dp"
-                    app:cardBackgroundColor="#F5F5F5"
+                    app:cardBackgroundColor="@color/colorSurfaceVariant"
                     app:cardElevation="0dp">
                     
                     <TextView
@@ -68,7 +107,7 @@
                         android:paddingVertical="4dp"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:textColor="#616161"
+                        android:textColor="@color/colorTextSecondary"
                         android:textAllCaps="true"/>
                 </androidx.cardview.widget.CardView>
             </LinearLayout>
@@ -78,7 +117,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:textColor="#757575"
+                android:textColor="@color/colorTextSecondary"
                 android:maxLines="2"
                 android:ellipsize="end"
                 android:layout_marginBottom="12dp"/>

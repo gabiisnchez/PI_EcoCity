@@ -175,16 +175,16 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
         // Asignar colores según nivel de urgencia
         switch (urgency.toLowerCase()) {
             case "alta":
-                color = Color.parseColor("#FFEBEE"); // Rojo claro
-                tvUrgencia.setTextColor(Color.parseColor("#D32F2F")); // Rojo oscuro
+                color = androidx.core.content.ContextCompat.getColor(this, R.color.urgency_high_bg);
+                tvUrgencia.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.urgency_high));
                 break;
             case "media":
-                color = Color.parseColor("#FFF8E1"); // Ámbar claro
-                tvUrgencia.setTextColor(Color.parseColor("#FFA000")); // Ámbar oscuro
+                color = androidx.core.content.ContextCompat.getColor(this, R.color.urgency_medium_bg);
+                tvUrgencia.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.urgency_medium));
                 break;
             default: // Baja
-                color = Color.parseColor("#E8F5E9"); // Verde claro
-                tvUrgencia.setTextColor(Color.parseColor("#388E3C")); // Verde oscuro
+                color = androidx.core.content.ContextCompat.getColor(this, R.color.urgency_low_bg);
+                tvUrgencia.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.urgency_low));
                 break;
         }
         cardUrgencia.setCardBackgroundColor(color);
@@ -200,16 +200,16 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
         int bgRes, textRes, iconRes;
 
         if (estado.equalsIgnoreCase("En proceso")) {
-            bgRes = Color.parseColor("#E3F2FD"); // Azul claro
-            textRes = Color.parseColor("#1976D2"); // Azul
+            bgRes = androidx.core.content.ContextCompat.getColor(this, R.color.colorStatProcessBg);
+            textRes = androidx.core.content.ContextCompat.getColor(this, R.color.colorStatProcessText);
             iconRes = android.R.drawable.ic_popup_sync;
         } else if (estado.equalsIgnoreCase("Resuelta")) {
-            bgRes = Color.parseColor("#E8F5E9"); // Verde claro
-            textRes = Color.parseColor("#388E3C"); // Verde
+            bgRes = androidx.core.content.ContextCompat.getColor(this, R.color.colorStatResolvedBg);
+            textRes = androidx.core.content.ContextCompat.getColor(this, R.color.colorStatResolvedText);
             iconRes = android.R.drawable.checkbox_on_background;
         } else { // Pendiente
-            bgRes = Color.parseColor("#EEEEEE"); // Gris claro
-            textRes = Color.parseColor("#616161"); // Gris
+            bgRes = androidx.core.content.ContextCompat.getColor(this, R.color.colorStatPendingBg);
+            textRes = androidx.core.content.ContextCompat.getColor(this, R.color.colorStatPendingText);
             iconRes = android.R.drawable.ic_menu_help;
         }
 
@@ -227,7 +227,7 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
             // Mostrar coordenadas
             tvLocationText.setText(String.format(getString(R.string.detail_location_title),
                     String.format("%.4f", incidencia.getLatitud()), String.format("%.4f", incidencia.getLongitud())));
-            tvLocationText.setTextColor(Color.parseColor("#2E7D32"));
+            tvLocationText.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.urgency_low)); // Green
 
             // Mostrar Mapa
             mapView.setVisibility(View.VISIBLE);
@@ -247,7 +247,7 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
         } else {
             // Ocultar mapa si no hay coordenadas
             tvLocationText.setText(getString(R.string.detail_no_location));
-            tvLocationText.setTextColor(Color.parseColor("#757575"));
+            tvLocationText.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.colorTextSecondary));
             mapView.setVisibility(View.GONE);
         }
     }

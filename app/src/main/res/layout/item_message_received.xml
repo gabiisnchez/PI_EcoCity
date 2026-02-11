@@ -14,21 +14,29 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:cardCornerRadius="16dp"
-        app:cardBackgroundColor="#F5F5F5"
-        app:cardElevation="0dp"
+        app:cardElevation="2dp"
+        app:cardBackgroundColor="@color/colorMessageReceivedBg"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintWidth_max="300dp">
+        app:layout_constrainedWidth="true"
+        app:layout_constraintWidth_percent="0.8"
+        android:layout_marginStart="8dp">
 
-        <TextView
-            android:id="@+id/tvMessage"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Gracias por contactar."
-            android:textColor="#424242"
-            android:textSize="16sp"
-            android:padding="12dp"/>
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/tvMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mensaje de prueba recibido"
+                android:textSize="16sp"
+                android:textColor="@color/colorMessageReceivedText"/>
+        </LinearLayout>
     </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

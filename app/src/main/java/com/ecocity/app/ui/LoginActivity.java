@@ -32,54 +32,52 @@ import com.google.android.material.textfield.TextInputEditText;
 public class LoginActivity extends AppCompatActivity {
 
     // --- Componentes de UI ---
-    // Campos de texto para entrada de datos
     private TextInputEditText etEmail, etPassword, etName, etSurnames;
-
-    // Contenedores de texto (TextInputLayout) para gestionar errores visuales y
-    // etiquetas flotantes
     private com.google.android.material.textfield.TextInputLayout tilName, tilSurnames, tilEmail, tilPassword;
-
-    // Botón principal de acción (Entrar / Registrarse)
     private Button btnLogin;
-
-    // Texto interactivo para cambiar de modo (Login <-> Registro)
     private android.widget.TextView tvToggleMode, tvTitle;
 
     // --- Lógica de Negocio y Datos ---
-    private com.ecocity.app.database.UserDAO userDAO; // Objeto de Acceso a Datos de Usuario (SQLite)
-    private boolean isLoginMode = true; // Variable de estado: true = Login, false = Registro
-    private com.ecocity.app.utils.SessionManager session; // Gestor de Sesión (SharedPreferences)
+    // private com.ecocity.app.database.UserDAO userDAO; // Comentado: Migración a
+    // Firebase
+    private boolean isLoginMode = true;
+    private com.ecocity.app.utils.SessionManager session;
 
-    /**
-     * Método de ciclo de vida onCreate.
-     * Se ejecuta al iniciar la actividad. Configura la UI y la lógica inicial.
-     * 
-     * @param savedInstanceState Estado guardado.
-     */
+    // Firebase Auth
+    private com.google.firebase.auth.FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Inicializar Firebase Auth
+        mAuth = com.google.firebase.auth.FirebaseAuth.getInstance();
+
         // 1. Verificación de Sesión Activa
-        // Si el usuario ya está logueado, redirigimos directos a la pantalla principal
-        // sin pasar por login
         session = new com.ecocity.app.utils.SessionManager(getApplicationContext());
-        if (session.isLoggedIn()) {
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish(); // Evita volver al Login pulsando 'Atrás'
+        if (session.isLoggedIn() || mAuth.getCurrentUser() != null) {
+            // Sincronizar sesión si Firebase tiene usuario pero SessionManager no (caso
+            // borde)
+            if (mAuth.getCurrentUser() != null && !session.isLoggedIn()) {
+                String name = mAuth.getCurrentUser().getDisplayName();
+                String email = mAuth.getCurrentUser().getEmail();
+                session.createLoginSession(name != null ? name : "Usuario", email);
+            }
+
+            launchMainActivity();
             return;
         }
 
-        // 2. Inicialización de Base de Datos
-        userDAO = new com.ecocity.app.database.UserDAO(this);
-        userDAO.open();
+        /*
+         * // 2. Inicialización de Base de Datos (SQLite - Legacy)
+         * userDAO = new com.ecocity.app.database.UserDAO(this);
+         * userDAO.open();
+         */
 
         // 3. Configuración de UI
         androidx.activity.EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
 
-        // Ajuste de insets para diseño edge-to-edge (pantalla completa)
         androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             androidx.core.graphics.Insets systemBars = insets
                     .getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars());
@@ -87,7 +85,7 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Binding de Vistas (Enlace variables Java -> XML)
+        // Binding de Vistas
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         etName = findViewById(R.id.etName);
@@ -102,13 +100,9 @@ public class LoginActivity extends AppCompatActivity {
         tvToggleMode = findViewById(R.id.tvToggleMode);
         tvTitle = findViewById(R.id.tvTitle);
 
-        // --- Listeners de Eventos ---
-
-        // Listener para cambiar modo (Login <-> Registro) al hacer clic en el texto
+        // Listeners
         tvToggleMode.setOnClickListener(v -> toggleMode());
 
-        // TextWatchers: Limpian los mensajes de error cuando el usuario empieza a
-        // escribir para mejorar UX
         android.text.TextWatcher textWatcher = new android.text.TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -116,7 +110,6 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Al escribir, borramos los errores visuales rojos
                 tilEmail.setError(null);
                 tilPassword.setError(null);
             }
@@ -128,90 +121,57 @@ public class LoginActivity extends AppCompatActivity {
         etEmail.addTextChangedListener(textWatcher);
         etPassword.addTextChangedListener(textWatcher);
 
-        // Acción del botón principal
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Limpiar errores previos
-                tilEmail.setError(null);
-                tilPassword.setError(null);
+        btnLogin.setOnClickListener(v -> {
+            tilEmail.setError(null);
+            tilPassword.setError(null);
 
-                // Si la validación de campos es correcta, procedemos
-                if (validateInput()) {
-                    if (isLoginMode) {
-                        performLogin();
-                    } else {
-                        performRegistration();
-                    }
+            if (validateInput()) {
+                if (isLoginMode) {
+                    performLogin();
+                } else {
+                    performRegistration();
                 }
             }
         });
     }
 
-    /**
-     * Alterna la interfaz entre Modo Login y Modo Registro.
-     * Cambia textos, visibilidad de campos (Nombre/Apellidos) y títulos
-     * dinámicamente.
-     */
     private void toggleMode() {
-        isLoginMode = !isLoginMode; // Invertir estado
+        isLoginMode = !isLoginMode;
 
         if (isLoginMode) {
-            // Configuración visual para Login
             tvTitle.setText(getString(R.string.title_welcome));
             btnLogin.setText(getString(R.string.btn_login));
             tvToggleMode.setText(getString(R.string.text_no_account));
-
-            // Ocultar campos innecesarios para Login (Nombre y Apellidos)
             tilName.setVisibility(View.GONE);
             tilSurnames.setVisibility(View.GONE);
         } else {
-            // Configuración visual para Registro
             tvTitle.setText(getString(R.string.title_create_account));
             btnLogin.setText(getString(R.string.btn_register));
             tvToggleMode.setText(getString(R.string.text_has_account));
-
-            // Mostrar campos adicionales necesarios para Registro
             tilName.setVisibility(View.VISIBLE);
             tilSurnames.setVisibility(View.VISIBLE);
         }
     }
 
-    /**
-     * Valida los datos introducidos por el usuario en el formulario.
-     * Verifica campos vacíos y formato de email.
-     * 
-     * @return true si todos los datos son válidos, false si hay errores.
-     */
     private boolean validateInput() {
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
-        // 1. Validar Email vacio
         if (TextUtils.isEmpty(email)) {
             tilEmail.setError(getString(R.string.error_email_required));
             return false;
-        } else {
-            tilEmail.setError(null);
         }
 
-        // 2. Validar Formato Email (usando Regex de Android)
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             tilEmail.setError(getString(R.string.error_email_invalid));
             return false;
-        } else {
-            tilEmail.setError(null);
         }
 
-        // 3. Validar Contraseña vacía
         if (TextUtils.isEmpty(password)) {
             tilPassword.setError(getString(R.string.error_password_required));
             return false;
-        } else {
-            tilPassword.setError(null);
         }
 
-        // 4. Validaciones extra exclusivas para el modo Registro
         if (!isLoginMode) {
             String name = etName.getText().toString().trim();
             String surnames = etSurnames.getText().toString().trim();
@@ -219,107 +179,95 @@ public class LoginActivity extends AppCompatActivity {
             if (TextUtils.isEmpty(name)) {
                 tilName.setError(getString(R.string.error_name_required));
                 return false;
-            } else {
-                tilName.setError(null);
             }
-
             if (TextUtils.isEmpty(surnames)) {
                 tilSurnames.setError(getString(R.string.error_surnames_required));
                 return false;
-            } else {
-                tilSurnames.setError(null);
             }
         }
         return true;
     }
 
     /**
-     * Realiza la lógica de inicio de sesión.
-     * Verifica credenciales contra la base de datos o usuario demo.
+     * Inicio de sesión usando Firebase Auth
      */
     private void performLogin() {
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
-        // 1. Usuario Demo (Hardcoded para pruebas rápidas sin necesidad de registrarse)
-        if (email.equals("usuario@ecocity.com") && password.equals("123456")) {
-            session.createLoginSession("Usuario Demo", email);
-            launchMainActivity();
-            return;
-        }
+        // Mostrar indicador de carga (opcional, por ahora bloqueamos el botón)
+        btnLogin.setEnabled(false);
 
-        // 2. Verificación Real contra Base de Datos SQLite
-        com.ecocity.app.model.User user = userDAO.login(email, password);
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    btnLogin.setEnabled(true);
+                    if (task.isSuccessful()) {
+                        // Login exitoso
+                        com.google.firebase.auth.FirebaseUser user = mAuth.getCurrentUser();
+                        String name = user.getDisplayName();
 
-        if (user != null) {
-            // Login Exitoso: Guardar sesión y navegar
-            session.createLoginSession(user.getName(), user.getEmail());
-            launchMainActivity();
-        } else {
-            // Login Fallido: Mostrar error visual
-            tilEmail.setError(" ");
-            tilPassword.setError(getString(R.string.error_auth_failed));
-            etPassword.requestFocus();
-            Toast.makeText(this, getString(R.string.error_auth_failed), Toast.LENGTH_SHORT).show();
-        }
+                        // Guardar sesión local para compatibilidad
+                        session.createLoginSession(name != null ? name : "Usuario", user.getEmail());
+
+                        Toast.makeText(LoginActivity.this, "Bienvenido " + (name != null ? name : ""),
+                                Toast.LENGTH_SHORT).show();
+                        launchMainActivity();
+                    } else {
+                        // Login fallido
+                        Toast.makeText(LoginActivity.this, getString(R.string.error_auth_failed),
+                                Toast.LENGTH_SHORT).show();
+                        tilPassword.setError(getString(R.string.error_auth_failed));
+                    }
+                });
     }
 
     /**
-     * Realiza la lógica de registro de nuevo usuario.
-     * Guarda el nuevo usuario en la base de datos si el email no existe.
+     * Registro usando Firebase Auth
      */
     private void performRegistration() {
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         String name = etName.getText().toString().trim();
+        String apellidos = etSurnames.getText().toString().trim();
+        String fullName = name + " " + apellidos;
 
-        // 1. Verificar si el email ya existe en la BD
-        if (userDAO.checkEmailExists(email)) {
-            tilEmail.setError(getString(R.string.error_email_exists));
-            return;
-        }
+        btnLogin.setEnabled(false);
 
-        // 2. Guardar nuevo usuario en Base de Datos
-        com.ecocity.app.model.User newUser = new com.ecocity.app.model.User(name, email, password);
-        long result = userDAO.registerUser(newUser);
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Registro exitoso, actualizar perfil con nombre
+                        com.google.firebase.auth.FirebaseUser user = mAuth.getCurrentUser();
 
-        if (result > 0) {
-            // Registro Exitoso
-            Toast.makeText(this, getString(R.string.msg_register_success), Toast.LENGTH_SHORT).show();
+                        com.google.firebase.auth.UserProfileChangeRequest profileUpdates = new com.google.firebase.auth.UserProfileChangeRequest.Builder()
+                                .setDisplayName(fullName)
+                                .build();
 
-            // Limpiar campos y cambiar a modo Login automáticamente para que el usuario
-            // entre
-            etEmail.setText("");
-            etPassword.setText("");
-            etName.setText("");
-            etSurnames.setText("");
+                        user.updateProfile(profileUpdates)
+                                .addOnCompleteListener(task1 -> {
+                                    btnLogin.setEnabled(true);
+                                    if (task1.isSuccessful()) {
+                                        // Guardar sesión local
+                                        session.createLoginSession(fullName, user.getEmail());
 
-            toggleMode();
-        } else {
-            // Error en Registro (ej: fallo de escritura en BBDD)
-            Toast.makeText(this, getString(R.string.msg_register_error), Toast.LENGTH_SHORT).show();
-        }
+                                        Toast.makeText(LoginActivity.this, getString(R.string.msg_register_success),
+                                                Toast.LENGTH_SHORT).show();
+                                        launchMainActivity();
+                                    }
+                                });
+                    } else {
+                        // Error en registro (ej: email duplicado, password débil)
+                        btnLogin.setEnabled(true);
+                        String errorMsg = task.getException() != null ? task.getException().getMessage()
+                                : "Error en el registro";
+                        Toast.makeText(LoginActivity.this, errorMsg, Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
-    /**
-     * Navega a la actividad principal (MainActivity).
-     * Cierra la actividad de login para que no se pueda volver atrás.
-     */
     private void launchMainActivity() {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
-        finish(); // Cierra LoginActivity
-    }
-
-    /**
-     * Limpieza de recursos al destruir la actividad.
-     * Cerramos la conexión a la base de datos.
-     */
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (userDAO != null) {
-            userDAO.close();
-        }
+        finish();
     }
 }

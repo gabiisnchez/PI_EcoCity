@@ -92,11 +92,12 @@ public class SessionManager {
      * Borra los datos de SharedPreferences y redirige al Login.
      */
     public void logoutUser() {
-        // Borrar datos de sesión
-        editor.remove(IS_LOGIN);
-        editor.remove(KEY_NAME);
-        editor.remove(KEY_EMAIL);
-        editor.apply();
+        // Borrar datos de sesión local
+        editor.clear();
+        editor.commit();
+
+        // Cerrar sesión en Firebase
+        com.google.firebase.auth.FirebaseAuth.getInstance().signOut();
 
         // Redirigir a Login
         Intent i = new Intent(_context, LoginActivity.class);

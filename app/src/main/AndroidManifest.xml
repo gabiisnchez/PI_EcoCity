@@ -56,7 +56,7 @@
         <activity
             android:name=".ui.LoginActivity"
             android:exported="true"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="stateHidden|adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -71,7 +71,7 @@
             android:name=".ui.AddIncidenciaActivity"
             android:exported="false"
             android:label="@string/title_activity_add_incidencia"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="stateHidden|adjustPan" />
             
         <!-- Detalle de Incidencia -->
         <activity android:name=".ui.DetailIncidenciaActivity" android:exported="false" android:label="Detalle Incidencia"/>

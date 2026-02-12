@@ -45,14 +45,7 @@
                 android:background="@android:color/white"/>
         </androidx.cardview.widget.CardView>
 
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/profile_title"
-            android:textColor="@android:color/white"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+
 
         <TextView
             android:id="@+id/tvUserName"

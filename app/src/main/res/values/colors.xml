@@ -53,8 +53,8 @@
     <color name="colorStatTotalText">#0277BD</color>
     <color name="colorStatResolvedBg">#E8F5E9</color>
     <color name="colorStatResolvedText">#2E7D32</color>
-    <color name="colorStatProcessBg">#FFF3E0</color>
-    <color name="colorStatProcessText">#EF6C00</color>
+    <color name="colorStatProcessBg">#E3F2FD</color>
+    <color name="colorStatProcessText">#1976D2</color>
     <color name="colorStatPendingBg">#FAFAFA</color>
     <color name="colorStatPendingText">#757575</color>
 </resources>

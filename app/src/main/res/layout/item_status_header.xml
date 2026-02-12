@@ -35,19 +35,20 @@
         android:textColor="@color/colorTextPrimary"
         android:layout_marginStart="12dp"/>
 
+    <!-- Separador invisible para empujar el icono a la derecha -->
     <View
         android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_weight="1"
-        android:background="#E0E0E0"
-        android:layout_marginStart="12dp"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+
 
     <!-- Icono de Expandir/Colapsar -->
     <ImageView
         android:id="@+id/ivExpand"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@android:drawable/arrow_down_float"
+        android:src="@drawable/ic_chevron_down"
         app:tint="@color/colorIconTint"/>
 
 </LinearLayout>

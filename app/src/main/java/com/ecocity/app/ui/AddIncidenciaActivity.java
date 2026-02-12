@@ -433,9 +433,25 @@ public class AddIncidenciaActivity extends AppCompatActivity {
      */
     private void deleteIncidencia() {
         if (incidenciaToEdit != null) {
-            incidenciaDAO.deleteIncidencia(incidenciaToEdit.getId());
+            // Optimistic UI for delete
             Toast.makeText(this, getString(R.string.msg_deleted), Toast.LENGTH_SHORT).show();
-            finish(); // Cierra la actividad tras borrar
+            finish();
+
+            incidenciaDAO.deleteIncidencia(incidenciaToEdit.getId(), new IncidenciaDAO.FirestoreCallback() {
+                @Override
+                public void onSuccess(String result) {
+                    android.util.Log.d("AddIncidencia", "Incidencia eliminada: " + result);
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    android.util.Log.e("AddIncidencia", "Error al eliminar: " + e.getMessage());
+                }
+
+                @Override
+                public void onDataLoaded(java.util.List<Incidencia> incidencias) {
+                }
+            });
         }
     }
 
@@ -466,65 +482,58 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         final String fotoPath = currentPhotoPath != null ? currentPhotoPath : "";
         final String estado = spinnerEstado.getSelectedItem().toString();
 
-        // 3. Bloquear UI
-        btnSave.setEnabled(false);
+        // 3. UI Optimista: Asumimos éxito y cerramos
+        // Firestore maneja la persistencia offline y sincronización automáticamente.
+        Toast.makeText(this,
+                incidenciaToEdit != null ? getString(R.string.msg_updated)
+                        : getString(R.string.msg_saved),
+                Toast.LENGTH_SHORT).show();
+        finish();
 
-        // 4. Iniciar Hilo de Trabajo (Worker Thread)
-        new Thread(new Runnable() {
+        // 4. Lógica de Negocio en segundo plano (Fire and Forget para la UI)
+        IncidenciaDAO.FirestoreCallback callback = new IncidenciaDAO.FirestoreCallback() {
             @Override
-            public void run() {
-                boolean success = false;
-
-                // Lógica de Negocio: Insertar vs Actualizar
-                if (incidenciaToEdit != null) {
-                    // Update
-                    incidenciaToEdit.setTitulo(titulo);
-                    incidenciaToEdit.setDescripcion(descripcion);
-                    incidenciaToEdit.setUrgencia(urgencia);
-                    incidenciaToEdit.setFotoPath(fotoPath);
-                    incidenciaToEdit.setLatitud(currentLat);
-                    incidenciaToEdit.setLongitud(currentLng);
-                    incidenciaToEdit.setEstado(estado);
-
-                    int result = incidenciaDAO.updateIncidencia(incidenciaToEdit);
-                    success = (result > 0);
-                } else {
-                    // Insert
-                    Incidencia incidencia = new Incidencia(titulo, descripcion, urgencia, fotoPath, currentLat,
-                            currentLng);
-
-                    // Asignar al usuario actual
-                    com.ecocity.app.utils.SessionManager session = new com.ecocity.app.utils.SessionManager(
-                            getApplicationContext());
-                    String email = session.getUserDetails().get(com.ecocity.app.utils.SessionManager.KEY_EMAIL);
-                    incidencia.setUserEmail(email);
-
-                    long result = incidenciaDAO.insertIncidencia(incidencia);
-                    success = (result != -1);
-                }
-
-                // 5. Volver al Hilo UI para mostrar resultado
-                final boolean finalSuccess = success;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        btnSave.setEnabled(true); // Desbloquear UI
-
-                        if (finalSuccess) {
-                            Toast.makeText(AddIncidenciaActivity.this,
-                                    incidenciaToEdit != null ? getString(R.string.msg_updated)
-                                            : getString(R.string.msg_saved),
-                                    Toast.LENGTH_SHORT).show();
-                            finish(); // Cerrar Activity
-                        } else {
-                            Toast.makeText(AddIncidenciaActivity.this,
-                                    getString(R.string.msg_error_save),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+            public void onSuccess(String result) {
+                // Éxito en sincronización (puede ocurrir más tarde)
+                android.util.Log.d("AddIncidencia", "Incidencia guardada/sincronizada ID: " + result);
             }
-        }).start(); // Arrancar el hilo
+
+            @Override
+            public void onFailure(Exception e) {
+                // Error real (ej: permisos denegados).
+                // Como la actividad ya se cerró, solo podemos loguear.
+                android.util.Log.e("AddIncidencia", "Error al guardar en Firestore: " + e.getMessage());
+            }
+
+            @Override
+            public void onDataLoaded(java.util.List<Incidencia> incidencias) {
+            }
+        };
+
+        if (incidenciaToEdit != null) {
+            // Update
+            incidenciaToEdit.setTitulo(titulo);
+            incidenciaToEdit.setDescripcion(descripcion);
+            incidenciaToEdit.setUrgencia(urgencia);
+            incidenciaToEdit.setFotoPath(fotoPath);
+            incidenciaToEdit.setLatitud(currentLat);
+            incidenciaToEdit.setLongitud(currentLng);
+            incidenciaToEdit.setEstado(estado);
+
+            incidenciaDAO.updateIncidencia(incidenciaToEdit, callback);
+        } else {
+            // Insert
+            Incidencia incidencia = new Incidencia(titulo, descripcion, urgencia, fotoPath, currentLat,
+                    currentLng);
+
+            // Asignar al usuario actual
+            com.ecocity.app.utils.SessionManager session = new com.ecocity.app.utils.SessionManager(
+                    getApplicationContext());
+            String email = session.getUserDetails().get(com.ecocity.app.utils.SessionManager.KEY_EMAIL);
+            incidencia.setUserEmail(email);
+
+            incidenciaDAO.insertIncidencia(incidencia, callback);
+        }
     }
 
     /**

@@ -9,8 +9,9 @@ import java.io.Serializable;
  */
 public class Incidencia implements Serializable {
 
-    // Identificador único de la incidencia en la base de datos
-    private int id;
+    // Identificador único de la incidencia en la base de datos (Firestore usa
+    // String)
+    private String id;
 
     // Título breve del problema
     private String titulo;
@@ -21,30 +22,27 @@ public class Incidencia implements Serializable {
     // Nivel de urgencia: Alta, Media, Baja
     private String urgencia;
 
-    // Ruta del archivo de la foto adjunta (puede ser una URI de contenido o una
-    // ruta de archivo)
+    // Ruta del archivo de la foto adjunta
     private String fotoPath;
 
     // Estado actual de la incidencia: Pendiente, En proceso, Resuelta
     private String estado;
 
-    // Coordenadas geográficas para la ubicación del problema
+    // Coordenadas geográficas
     private double latitud;
     private double longitud;
 
-    // Email del usuario que reportó la incidencia (para filtrar por usuario)
+    // Email del usuario que reportó la incidencia
     private String userEmail;
 
     /**
-     * Constructor vacío requerido para ciertas operaciones de serialización o
-     * instanciación genérica.
+     * Constructor vacío requerido para Firestore.
      */
     public Incidencia() {
     }
 
     /**
      * Constructor principal para crear una nueva incidencia.
-     * El estado se inicializa por defecto a "Pendiente".
      *
      * @param titulo      Título de la incidencia.
      * @param descripcion Descripción del problema.
@@ -65,13 +63,12 @@ public class Incidencia implements Serializable {
     }
 
     // --- Getters y Setters ---
-    // Métodos para acceder y modificar los atributos privados de la clase
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

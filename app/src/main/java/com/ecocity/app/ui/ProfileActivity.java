@@ -104,21 +104,45 @@ public class ProfileActivity extends AppCompatActivity {
      * y actualiza la interfaz de usuario.
      */
     private void loadStats() {
-        incidenciaDAO.open();
-
         String email = session.getUserDetails().get(SessionManager.KEY_EMAIL);
 
-        // Consultas COUNT a la BD filtrando por usuario y estado
-        int total = incidenciaDAO.getIncidenciasCount(email, null); // null = Todos los estados
-        int resolved = incidenciaDAO.getIncidenciasCount(email, "Resuelta");
-        int process = incidenciaDAO.getIncidenciasCount(email, "En proceso");
-        int pending = incidenciaDAO.getIncidenciasCount(email, "Pendiente");
+        // Consultas COUNT asíncronas encadenadas (o paralelas, aquí encadenadas por
+        // simplicidad)
 
-        // Actualizar TextViews
-        tvCountTotal.setText(String.valueOf(total));
-        tvCountResolved.setText(String.valueOf(resolved));
-        tvCountProcess.setText(String.valueOf(process));
-        tvCountPending.setText(String.valueOf(pending));
+        // 1. Total
+        incidenciaDAO.getIncidenciasCount(email, null, new com.ecocity.app.database.IncidenciaDAO.CountCallback() {
+            @Override
+            public void onCountLoaded(int total) {
+                tvCountTotal.setText(String.valueOf(total));
+
+                // 2. Resueltas
+                incidenciaDAO.getIncidenciasCount(email, "Resuelta",
+                        new com.ecocity.app.database.IncidenciaDAO.CountCallback() {
+                            @Override
+                            public void onCountLoaded(int resolved) {
+                                tvCountResolved.setText(String.valueOf(resolved));
+
+                                // 3. En Proceso
+                                incidenciaDAO.getIncidenciasCount(email, "En proceso",
+                                        new com.ecocity.app.database.IncidenciaDAO.CountCallback() {
+                                            @Override
+                                            public void onCountLoaded(int process) {
+                                                tvCountProcess.setText(String.valueOf(process));
+
+                                                // 4. Pendientes
+                                                incidenciaDAO.getIncidenciasCount(email, "Pendiente",
+                                                        new com.ecocity.app.database.IncidenciaDAO.CountCallback() {
+                                                            @Override
+                                                            public void onCountLoaded(int pending) {
+                                                                tvCountPending.setText(String.valueOf(pending));
+                                                            }
+                                                        });
+                                            }
+                                        });
+                            }
+                        });
+            }
+        });
     }
 
     /**

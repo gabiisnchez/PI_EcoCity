@@ -122,28 +122,45 @@ public class MainActivity extends AppCompatActivity {
      * Gestiona la visibilidad de la vista "Vacía" vs el RecyclerView.
      */
     private void loadIncidencias() {
-        // Recuperar datos de BD
-        List<Incidencia> lista = incidenciaDAO.getAllIncidencias();
+        // Mostrar estado de carga (opcional, por ahora solo limpiamos/ocultamos)
+        // Podríamos poner un ProgressBar aquí
 
-        if (lista.isEmpty()) {
-            // Si no hay datos: Mostrar mensaje de vacío y ocultar lista
-            tvEmpty.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
-        } else {
-            // Si hay datos: Ocultar mensaje vacío y mostrar lista
-            tvEmpty.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
+        // Recuperar datos de Firestore asíncronamente
+        incidenciaDAO.getAllIncidencias(new IncidenciaDAO.FirestoreCallback() {
+            @Override
+            public void onDataLoaded(List<Incidencia> lista) {
+                if (lista.isEmpty()) {
+                    // Si no hay datos: Mostrar mensaje de vacío y ocultar lista
+                    tvEmpty.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                } else {
+                    // Si hay datos: Ocultar mensaje vacío y mostrar lista
+                    tvEmpty.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
 
-            if (adapter == null) {
-                // Primera vez: Crear adaptador y asignarlo
-                adapter = new IncidenciaAdapter(lista);
-                recyclerView.setAdapter(adapter);
-            } else {
-                // Veces subsecuentes: Actualizar datos en el adaptador existente
-                // Esto es más eficiente que crear uno nuevo
-                adapter.updateData(lista);
+                    if (adapter == null) {
+                        // Primera vez: Crear adaptador y asignarlo
+                        adapter = new IncidenciaAdapter(lista);
+                        recyclerView.setAdapter(adapter);
+                    } else {
+                        // Veces subsecuentes: Actualizar datos en el adaptador existente
+                        adapter.updateData(lista);
+                    }
+                }
             }
-        }
+
+            @Override
+            public void onFailure(Exception e) {
+                // Manejar error (ej: sin conexión)
+                android.widget.Toast.makeText(MainActivity.this,
+                        "Error al cargar incidencias: " + e.getMessage(),
+                        android.widget.Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSuccess(String result) {
+            }
+        });
     }
 
     /**

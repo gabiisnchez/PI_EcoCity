@@ -18,207 +18,185 @@ import java.util.List;
  */
 public class IncidenciaDAO {
 
-    private SQLiteDatabase database;
-    private DbHelper dbHelper;
+    private com.google.firebase.firestore.FirebaseFirestore db;
+    private static final String COLLECTION_NAME = "incidencias";
 
     /**
-     * Constructor del DAO.
-     * Instancia el DbHelper para preparar la conexión.
-     * 
-     * @param context Contexto de la aplicación.
+     * Interfaz para recibir resultados asíncronos de Firestore.
      */
+    public interface FirestoreCallback {
+        void onSuccess(String result); // Para inserts/updates
+
+        void onFailure(Exception e);
+
+        void onDataLoaded(List<Incidencia> incidencias); // Para lecturas
+    }
+
+    // Interfaz simple para conteos
+    public interface CountCallback {
+        void onCountLoaded(int count);
+    }
+
     public IncidenciaDAO(Context context) {
-        dbHelper = new DbHelper(context);
+        // Inicializar Firestore
+        db = com.google.firebase.firestore.FirebaseFirestore.getInstance();
     }
 
-    /**
-     * Abre la conexión con la base de datos en modo escritura.
-     * Debe llamarse antes de realizar cualquier operación.
-     */
     public void open() {
-        database = dbHelper.getWritableDatabase();
+        // No es necesario abrir conexión explícita en Firestore
     }
 
-    /**
-     * Cierra la conexión con la base de datos para liberar recursos.
-     * Debe llamarse cuando ya no se necesite el DAO (ej. en onDestroy).
-     */
     public void close() {
-        dbHelper.close();
+        // No es necesario cerrar conexión explícita en Firestore
     }
 
     /**
-     * INSERT: Inserta una nueva incidencia en la base de datos.
-     * 
-     * @param incidencia Objeto Incidencia con los datos a guardar.
-     * @return El ID de la nueva fila insertada o -1 si hubo un error.
+     * INSERT: Inserta una nueva incidencia en la colección 'incidencias'.
      */
-    public long insertIncidencia(Incidencia incidencia) {
-        ContentValues values = new ContentValues();
-        values.put(DbHelper.COLUMN_TITULO, incidencia.getTitulo());
-        values.put(DbHelper.COLUMN_DESCRIPCION, incidencia.getDescripcion());
-        values.put(DbHelper.COLUMN_URGENCIA, incidencia.getUrgencia());
-        values.put(DbHelper.COLUMN_FOTOPATH, incidencia.getFotoPath());
-        values.put(DbHelper.COLUMN_ESTADO, incidencia.getEstado());
-        values.put(DbHelper.COLUMN_LATITUD, incidencia.getLatitud());
-        values.put(DbHelper.COLUMN_LONGITUD, incidencia.getLongitud());
-        values.put(DbHelper.COLUMN_USER_EMAIL, incidencia.getUserEmail());
+    public void insertIncidencia(Incidencia incidencia, FirestoreCallback callback) {
+        // Generar ID único automáticamente si no existe (aunque Firestore lo hace al
+        // usar add,
+        // aquí lo generamos para tener referencia en el objeto)
+        // Usaremos .add() que genera el ID autmáticamente
 
-        // Metodo insert() devuelve el ID de la fila o -1
-        return database.insert(DbHelper.TABLE_INCIDENCIAS, null, values);
+        db.collection(COLLECTION_NAME)
+                .add(incidencia)
+                .addOnSuccessListener(documentReference -> {
+                    // Actualizar el objeto con el ID generado en Firestore
+                    incidencia.setId(documentReference.getId());
+                    documentReference.set(incidencia); // Re-guardar con el ID dentro del objeto (opcional pero útil)
+                    callback.onSuccess(documentReference.getId());
+                })
+                .addOnFailureListener(e -> {
+                    callback.onFailure(e);
+                });
     }
 
     /**
      * UPDATE: Actualiza los datos de una incidencia existente.
-     * Utiliza el ID de la incidencia para localizar la fila a modificar.
-     * 
-     * @param incidencia Objeto con los nuevos datos actualizados.
-     * @return Número de filas afectadas (debería ser 1 si todo va bien).
      */
-    public int updateIncidencia(Incidencia incidencia) {
-        ContentValues values = new ContentValues();
-        values.put(DbHelper.COLUMN_TITULO, incidencia.getTitulo());
-        values.put(DbHelper.COLUMN_DESCRIPCION, incidencia.getDescripcion());
-        values.put(DbHelper.COLUMN_URGENCIA, incidencia.getUrgencia());
-        values.put(DbHelper.COLUMN_FOTOPATH, incidencia.getFotoPath());
-        values.put(DbHelper.COLUMN_ESTADO, incidencia.getEstado());
-        values.put(DbHelper.COLUMN_LATITUD, incidencia.getLatitud());
-        values.put(DbHelper.COLUMN_LONGITUD, incidencia.getLongitud());
-        // Normalmente no permitimos cambiar el propietario (user_email), así que no se
-        // actualiza aquí.
-        // values.put(DbHelper.COLUMN_USER_EMAIL, incidencia.getUserEmail());
-
-        // clausula WHERE 'id = ?'
-        return database.update(DbHelper.TABLE_INCIDENCIAS, values,
-                DbHelper.COLUMN_ID + " = ?",
-                new String[] { String.valueOf(incidencia.getId()) });
-    }
-
-    /**
-     * DELETE: Elimina una incidencia físicamente de la base de datos por su ID.
-     * 
-     * @param id Identificador único de la incidencia a borrar.
-     */
-    public void deleteIncidencia(int id) {
-        database.delete(DbHelper.TABLE_INCIDENCIAS,
-                DbHelper.COLUMN_ID + " = ?",
-                new String[] { String.valueOf(id) });
-    }
-
-    /**
-     * READ (All): Obtiene todas las incidencias con un ordenamiento personalizado
-     * complejo.
-     * 
-     * Criterios de Ordenación:
-     * 1. Estado: Priorizamos las activas sobre las resueltas (En proceso >
-     * Pendientes > Resuelta).
-     * 2. Urgencia: Dentro del mismo estado, priorizamos por gravedad (Alta > Media
-     * > Baja).
-     * 
-     * @return Lista completa de incidencias ordenada estratégicamente.
-     */
-    public List<Incidencia> getAllIncidencias() {
-        List<Incidencia> incidencias = new ArrayList<>();
-
-        // Construcción de la sentencia ORDER BY personalizada usando CASE WHEN de SQL.
-        // Esto permite dar un valor numérico a cadenas de texto para ordenar
-        // semánticamente.
-
-        // CASE WHEN estado ... END ASC
-        String orderBy = "CASE " + DbHelper.COLUMN_ESTADO +
-                " WHEN 'En proceso' THEN 1 " + // Máxima prioridad visual
-                " WHEN 'Pendiente' THEN 2 " +
-                " WHEN 'Resuelta' THEN 3 " + // Al final de la lista
-                " ELSE 4 END ASC, " +
-                // Segundo criterio: CASE WHEN urgencia ... END ASC
-                "CASE " + DbHelper.COLUMN_URGENCIA +
-                " WHEN 'Alta' THEN 1 " +
-                " WHEN 'Media' THEN 2 " +
-                " WHEN 'Baja' THEN 3 " +
-                " ELSE 4 END ASC";
-
-        // Ejecutar consulta (SELECT * FROM incidencias ORDER BY ...)
-        Cursor cursor = database.query(DbHelper.TABLE_INCIDENCIAS,
-                null, null, null, null, null, orderBy);
-
-        // Iterar sobre los resultados (Cursor)
-        if (cursor.moveToFirst()) {
-            do {
-                Incidencia incidencia = new Incidencia();
-                incidencia.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_ID)));
-                incidencia.setTitulo(cursor.getString(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_TITULO)));
-
-                String descripcion = cursor.getString(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_DESCRIPCION));
-                incidencia.setDescripcion(descripcion != null ? descripcion : "");
-
-                String urgencia = cursor.getString(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_URGENCIA));
-                incidencia.setUrgencia(urgencia != null ? urgencia : "Baja");
-
-                incidencia.setFotoPath(cursor.getString(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_FOTOPATH)));
-                incidencia.setEstado(cursor.getString(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_ESTADO)));
-                incidencia.setLatitud(cursor.getDouble(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_LATITUD)));
-                incidencia.setLongitud(cursor.getDouble(cursor.getColumnIndexOrThrow(DbHelper.COLUMN_LONGITUD)));
-
-                // Recuperar email del usuario creador
-                int emailIndex = cursor.getColumnIndex(DbHelper.COLUMN_USER_EMAIL);
-                if (emailIndex != -1) {
-                    incidencia.setUserEmail(cursor.getString(emailIndex));
-                }
-
-                incidencias.add(incidencia);
-            } while (cursor.moveToNext());
+    public void updateIncidencia(Incidencia incidencia, FirestoreCallback callback) {
+        if (incidencia.getId() == null) {
+            callback.onFailure(new Exception("ID de incidencia nulo"));
+            return;
         }
-        cursor.close(); // Siempre cerrar el cursor para evitar fugas de memoria
-        return incidencias;
+
+        db.collection(COLLECTION_NAME).document(incidencia.getId())
+                .set(incidencia)
+                .addOnSuccessListener(aVoid -> callback.onSuccess("Actualizado"))
+                .addOnFailureListener(e -> callback.onFailure(e));
     }
 
     /**
-     * COUNT: Cuenta el número de incidencias aplicando filtros opcionales.
-     * Útil para generar estadísticas en el perfil de usuario.
-     * 
-     * @param userEmail Email del usuario para filtrar (null para contar todas).
-     * @param estado    Estado específico para filtrar (null para contar cualquier
-     *                  estado).
-     * @return Número entero de incidencias que cumplen los criterios.
+     * DELETE: Elimina una incidencia por su ID.
      */
-    public int getIncidenciasCount(String userEmail, String estado) {
-        int count = 0;
-        String selection = "";
-        List<String> argsList = new ArrayList<>();
+    public void deleteIncidencia(String id, FirestoreCallback callback) {
+        db.collection(COLLECTION_NAME).document(id)
+                .delete()
+                .addOnSuccessListener(aVoid -> callback.onSuccess("Eliminado"))
+                .addOnFailureListener(e -> callback.onFailure(e));
+    }
 
-        // Constuir clausula WHERE dinámicamente
+    /**
+     * READ (All): Obtiene todas las incidencias.
+     * El ordenamiento complejo lo haremos en cliente (Java) o índices compuestos en
+     * Firestore.
+     * Por simplicidad inicial, descargaremos y ordenaremos en memoria (si la lista
+     * no es gigante).
+     */
+    public void getAllIncidencias(FirestoreCallback callback) {
+        db.collection(COLLECTION_NAME)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Incidencia> lista = new ArrayList<>();
+                    for (com.google.firebase.firestore.DocumentSnapshot doc : queryDocumentSnapshots) {
+                        Incidencia i = doc.toObject(Incidencia.class);
+                        if (i != null) {
+                            i.setId(doc.getId()); // Asegurar ID
+                            lista.add(i);
+                        }
+                    }
+                    // Ordenamiento en cliente (Memoria) para replicar la lógica compleja de SQL
+                    sortIncidencias(lista);
+                    callback.onDataLoaded(lista);
+                })
+                .addOnFailureListener(e -> callback.onFailure(e));
+    }
 
-        // 1. Filtro por Usuario
+    /**
+     * Ordena la lista de incidencias según la lógica de negocio:
+     * 1. Estado: En proceso > Pendiente > Resuelta
+     * 2. Urgencia: Alta > Media > Baja
+     */
+    private void sortIncidencias(List<Incidencia> lista) {
+        java.util.Collections.sort(lista, new java.util.Comparator<Incidencia>() {
+            @Override
+            public int compare(Incidencia i1, Incidencia i2) {
+                // 1. Estado
+                int s1 = getStatusPriority(i1.getEstado());
+                int s2 = getStatusPriority(i2.getEstado());
+                if (s1 != s2)
+                    return Integer.compare(s1, s2);
+
+                // 2. Urgencia
+                int u1 = getUrgencyPriority(i1.getUrgencia());
+                int u2 = getUrgencyPriority(i2.getUrgencia());
+                return Integer.compare(u1, u2);
+            }
+        });
+    }
+
+    private int getStatusPriority(String status) {
+        if (status == null)
+            return 4;
+        switch (status) {
+            case "En proceso":
+                return 1;
+            case "Pendiente":
+                return 2;
+            case "Resuelta":
+                return 3;
+            default:
+                return 4;
+        }
+    }
+
+    private int getUrgencyPriority(String urgency) {
+        if (urgency == null)
+            return 4;
+        switch (urgency) {
+            case "Alta":
+                return 1;
+            case "Media":
+                return 2;
+            case "Baja":
+                return 3;
+            default:
+                return 4;
+        }
+    }
+
+    /**
+     * COUNT: Cuenta incidencias con filtros.
+     */
+    public void getIncidenciasCount(String userEmail, String estado, CountCallback callback) {
+        com.google.firebase.firestore.Query query = db.collection(COLLECTION_NAME);
+
         if (userEmail != null) {
-            selection += DbHelper.COLUMN_USER_EMAIL + " = ?";
-            argsList.add(userEmail);
+            query = query.whereEqualTo("userEmail", userEmail);
         }
-
-        // 2. Filtro por Estado
         if (estado != null) {
-            // Añadir 'AND' si ya había una condición previa
-            if (!selection.isEmpty())
-                selection += " AND ";
-            selection += DbHelper.COLUMN_ESTADO + " = ?";
-            argsList.add(estado);
+            query = query.whereEqualTo("estado", estado);
         }
 
-        // Convertir lista de argumentos a Array
-        String[] selectionArgs = argsList.isEmpty() ? null : argsList.toArray(new String[0]);
-        if (selection.isEmpty())
-            selection = null; // Si no hay filtros, selection es null (selecciona todo)
-
-        // Ejecutar consulta COUNT(*)
-        Cursor cursor = database.query(DbHelper.TABLE_INCIDENCIAS,
-                new String[] { "COUNT(*)" }, // Proyección: Solo deulve el conteo
-                selection,
-                selectionArgs,
-                null, null, null);
-
-        if (cursor.moveToFirst()) {
-            count = cursor.getInt(0);
-        }
-        cursor.close();
-        return count;
+        // Usamos count() aggregation de Firestore (más eficiente que descargar
+        // documentos)
+        // Requiere AggregateQuerySnapshot (disponible en BOM recientes)
+        // Si hay error en versión antigua, fallback a size()
+        query.get().addOnSuccessListener(queryDocumentSnapshots -> {
+            callback.onCountLoaded(queryDocumentSnapshots.size());
+        }).addOnFailureListener(e -> {
+            callback.onCountLoaded(0); // Fail safe
+        });
     }
 }

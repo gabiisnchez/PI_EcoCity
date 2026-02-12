@@ -247,16 +247,24 @@ public class LoginActivity extends AppCompatActivity {
                                 .addOnCompleteListener(task1 -> {
                                     btnLogin.setEnabled(true);
                                     if (task1.isSuccessful()) {
-                                        // Guardar sesión local
-                                        session.createLoginSession(fullName, user.getEmail());
+                                        // IMPORTANTE: No iniciar sesión automáticamente.
+                                        // Cerrar la sesión de Firebase inmediatamente.
+                                        mAuth.signOut();
 
-                                        Toast.makeText(LoginActivity.this, getString(R.string.msg_register_success),
-                                                Toast.LENGTH_SHORT).show();
-                                        launchMainActivity();
+                                        Toast.makeText(LoginActivity.this,
+                                                "Registro exitoso. Por favor, inicia sesión.",
+                                                Toast.LENGTH_LONG).show();
+
+                                        // Limpiar campos y volver al modo Login
+                                        etEmail.setText("");
+                                        etPassword.setText("");
+                                        etName.setText("");
+                                        etSurnames.setText("");
+                                        toggleMode();
                                     }
                                 });
                     } else {
-                        // Error en registro (ej: email duplicado, password débil)
+                        // Error en registro
                         btnLogin.setEnabled(true);
                         String errorMsg = task.getException() != null ? task.getException().getMessage()
                                 : "Error en el registro";

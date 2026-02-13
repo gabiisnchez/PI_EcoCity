@@ -23,6 +23,13 @@ import com.ecocity.app.database.IncidenciaDAO;
 import com.ecocity.app.model.Incidencia;
 import com.google.android.material.textfield.TextInputEditText;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -99,6 +106,9 @@ public class AddIncidenciaActivity extends AppCompatActivity {
     // --- Variables de Estado ---
     private double currentLat = 0.0; // Latitud seleccionada
     private double currentLng = 0.0; // Longitud seleccionada
+
+    // Mapa de previsualización
+    private MapView mapView;
 
     /**
      * Método onCreate(): Punto de entrada de la Activity.
@@ -259,6 +269,9 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                         tvLocationStatusDetail.setText(String.format(getString(R.string.text_location_registered),
                                 String.format("%.4f", currentLat), String.format("%.4f", currentLng)));
                         tvLocationStatusDetail.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+                        
+                        // Mostrar visualmente en mapa
+                        setupLocationPreview();
                     }
                 });
 
@@ -372,6 +385,43 @@ public class AddIncidenciaActivity extends AppCompatActivity {
     }
 
     /**
+     * Muestra una previsualización de la ubicación en un mapa tras seleccionarla.
+     */
+    private void setupLocationPreview() {
+        android.widget.FrameLayout mapContainer = findViewById(R.id.mapContainer);
+        if (mapContainer == null) return;
+
+        if (currentLat != 0.0 || currentLng != 0.0) {
+            mapContainer.setVisibility(View.VISIBLE);
+            
+            if (mapView == null) {
+                try {
+                    com.google.android.gms.maps.GoogleMapOptions options = new com.google.android.gms.maps.GoogleMapOptions().liteMode(true);
+                    mapView = new com.google.android.gms.maps.MapView(this, options);
+                    mapContainer.addView(mapView);
+                    mapView.onCreate(null);
+                    mapView.onResume(); 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return;
+                }
+            }
+
+            mapView.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+                    if (googleMap == null) return;
+                    LatLng location = new LatLng(currentLat, currentLng);
+                    googleMap.clear();
+                    googleMap.addMarker(new MarkerOptions().position(location));
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f));
+                    googleMap.getUiSettings().setMapToolbarEnabled(false);
+                }
+            });
+        }
+    }
+
+    /**
      * Configura la interfaz con los valores de la incidencia a editar.
      */
     private void setupEditMode() {
@@ -418,6 +468,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                 tvLocationStatusDetail.setText(String.format(getString(R.string.text_location_registered),
                         String.format("%.4f", currentLat), String.format("%.4f", currentLng)));
                 tvLocationStatusDetail.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+                setupLocationPreview();
             } else {
                 tvLocationStatusDetail.setText(getString(R.string.text_location_pending));
             }
@@ -547,5 +598,26 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         if (incidenciaDAO != null) {
             incidenciaDAO.close();
         }
+        if (mapView != null) {
+            mapView.onDestroy();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mapView != null) mapView.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mapView != null) mapView.onPause();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        if (mapView != null) mapView.onLowMemory();
     }
 }

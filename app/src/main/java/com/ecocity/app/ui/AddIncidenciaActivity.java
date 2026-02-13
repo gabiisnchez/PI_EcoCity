@@ -148,6 +148,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         spinnerUrgencia = findViewById(R.id.spinnerUrgencia);
         layoutEstado = findViewById(R.id.layoutEstado);
         spinnerEstado = findViewById(R.id.spinnerEstado);
+        spinnerEstado = findViewById(R.id.spinnerEstado);
         tvLocationStatusDetail = findViewById(R.id.tvLocationStatusDetail);
         tvHeader = findViewById(R.id.tvHeader);
 

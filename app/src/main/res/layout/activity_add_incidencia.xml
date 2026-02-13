@@ -1,63 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 
-    Layout para Añadir/Editar Incidencia
-    Utiliza ScrollView para permitir el desplazamiento en pantallas pequeñas.
-    Contiene campos para título, descripción, selección de urgencia, captura de foto y ubicación.
+    Layout para Añadir/Editar Incidencia (Unificado con Estilo Chat)
+    Estructura:
+    - ConstraintLayout (Raíz)
+      - Cabecera Fija (Estilo Chat)
+      - ScrollView (Contenido del formulario)
 -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:fillViewport="true">
+    android:background="#FAFAFA">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- Cabecera Fija (Estilo Unificado con Chat) -->
+    <LinearLayout
+        android:id="@+id/headerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="32dp">
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="@android:color/white"
+        android:elevation="4dp"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Cabecera con Botón Atrás y Título -->
-        <LinearLayout
-            android:id="@+id/headerLayout"
-            android:layout_width="match_parent"
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_arrow_back"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="@color/colorPrimary"
+            android:contentDescription="Atrás"
+            android:layout_marginEnd="8dp"/>
+
+        <TextView
+            android:id="@+id/tvHeader"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="40dp">
+            android:text="@string/title_activity_add_incidencia"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
 
-            <ImageButton
-                android:id="@+id/btnBack"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/ic_arrow_back"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                app:tint="@color/colorPrimary"
-                android:contentDescription="Atrás"
-                android:layout_marginEnd="8dp"/>
+    <!-- Contenido Desplazable -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/headerLayout"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-            <TextView
-                android:id="@+id/tvHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/title_activity_add_incidencia"
-                android:textSize="32sp"
-                android:fontFamily="sans-serif-black"
-                android:textColor="@color/colorPrimary"/>
-        </LinearLayout>
-
-        <!-- Formulario de Datos -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/headerLayout">
+            android:padding="24dp">
 
             <!-- Campo: Título -->
             <com.google.android.material.textfield.TextInputLayout
@@ -108,7 +109,7 @@
                 android:layout_marginBottom="12dp"
                 android:text="@string/label_urgency"
                 android:textColor="@color/colorPrimary"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <Spinner
@@ -134,14 +135,14 @@
                     android:layout_marginBottom="12dp"
                     android:text="@string/label_status"
                     android:textColor="@color/colorPrimary"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <Spinner
                     android:id="@+id/spinnerEstado"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="40dp"
+                    android:layout_marginBottom="24dp"
                     android:background="@drawable/input_field_bg"
                     android:minHeight="56dp"
                     android:padding="8dp" />
@@ -154,13 +155,13 @@
                 android:layout_marginBottom="12dp"
                 android:text="@string/label_multimedia"
                 android:textColor="@color/colorPrimary"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="24dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
                 app:cardBackgroundColor="@color/colorSurfaceVariant">
@@ -211,13 +212,13 @@
                 android:layout_marginBottom="12dp"
                 android:text="@string/label_location"
                 android:textColor="@color/colorPrimary"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="40dp"
+                android:layout_marginBottom="32dp"
                 android:background="@drawable/input_field_bg"
                 android:orientation="vertical"
                 android:padding="16dp">
@@ -294,6 +295,5 @@
                 app:backgroundTint="#F44336" />
 
         </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

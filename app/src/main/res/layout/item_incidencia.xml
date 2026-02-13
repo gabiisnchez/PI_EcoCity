@@ -96,7 +96,7 @@
                     android:id="@+id/ivLocationIcon"
                     android:layout_width="14dp"
                     android:layout_height="14dp"
-                    android:src="@android:drawable/ic_menu_myplaces"
+                    android:src="@drawable/ic_location_pin"
                     app:tint="@color/colorPrimary"
                     android:contentDescription="Location"/>
 

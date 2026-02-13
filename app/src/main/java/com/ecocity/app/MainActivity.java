@@ -5,14 +5,22 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.ecocity.app.database.IncidenciaDAO;
 import com.ecocity.app.model.Incidencia;
 import com.ecocity.app.ui.AddIncidenciaActivity;
 import com.ecocity.app.ui.IncidenciaAdapter;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -45,6 +53,12 @@ public class MainActivity extends AppCompatActivity {
     // Acceso a datos
     private IncidenciaDAO incidenciaDAO;
     private IncidenciaAdapter adapter;
+    private List<Incidencia> currentList; // Lista local para ordenar sin recargar
+
+    // Ubicación y Ordenación
+    private FusedLocationProviderClient fusedLocationClient;
+    private android.location.Location userLocation;
+    private ChipGroup chipGroupSort;
 
     /**
      * Inicialización de la Actividad.
@@ -73,9 +87,22 @@ public class MainActivity extends AppCompatActivity {
         // vertical)
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Inicializar base de datos
         incidenciaDAO = new IncidenciaDAO(this);
         incidenciaDAO.open();
+
+        // Inicializar Location Client
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // Configurar Chips de Ordenación
+        chipGroupSort = findViewById(R.id.chipGroupSort);
+        chipGroupSort.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.chipNearby) {
+                checkLocationPermissionAndSort();
+            } else {
+                // Chip "Urgencia": Ordenar por prioridad (Alta > Media > Baja)
+                sortListByUrgency();
+            }
+        });
 
         // Listener: Botón Añadir -> Navegar a AddIncidenciaActivity
         fabAdd.setOnClickListener(new View.OnClickListener() {
@@ -129,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
         incidenciaDAO.getAllIncidencias(new IncidenciaDAO.FirestoreCallback() {
             @Override
             public void onDataLoaded(List<Incidencia> lista) {
+                currentList = lista; // Guardar referencia local
                 if (lista.isEmpty()) {
                     // Si no hay datos: Mostrar mensaje de vacío y ocultar lista
                     tvEmpty.setVisibility(View.VISIBLE);
@@ -162,6 +190,103 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    /**
+     * Verifica permisos de ubicación. Si los tiene, obtiene la ubicación y ordena.
+     * Si no, los pide.
+     */
+    private void checkLocationPermissionAndSort() {
+        if (androidx.core.content.ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            getUserLocationAndSort();
+        } else {
+            // Pedir permiso
+            requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+    }
+
+    /**
+     * Obtiene la última ubicación conocida y ordena la lista.
+     */
+    private void getUserLocationAndSort() {
+        if (androidx.core.app.ActivityCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, location -> {
+                    if (location != null) {
+                        userLocation = location;
+                        sortListByProximity();
+                    } else {
+                        android.widget.Toast.makeText(this, "No se pudo obtener la ubicación actual", android.widget.Toast.LENGTH_SHORT).show();
+                        // Volver a selección "Urgencia" visualmente si falla
+                        chipGroupSort.check(R.id.chipUrgency);
+                    }
+                });
+    }
+
+    private void sortListByProximity() {
+        if (currentList == null || userLocation == null) return;
+        
+        Collections.sort(currentList, new Comparator<Incidencia>() {
+            @Override
+            public int compare(Incidencia o1, Incidencia o2) {
+                float[] results1 = new float[1];
+                float[] results2 = new float[1];
+                
+                android.location.Location.distanceBetween(userLocation.getLatitude(), userLocation.getLongitude(), 
+                        o1.getLatitud(), o1.getLongitud(), results1);
+                android.location.Location.distanceBetween(userLocation.getLatitude(), userLocation.getLongitude(), 
+                        o2.getLatitud(), o2.getLongitud(), results2);
+                
+                return Float.compare(results1[0], results2[0]);
+            }
+        });
+        
+        if (adapter != null) {
+            adapter.updateData(currentList);
+            // Hacer scroll al inicio
+            recyclerView.scrollToPosition(0);
+        }
+    }
+
+    private void sortListByUrgency() {
+         if (currentList != null && adapter != null) {
+             Collections.sort(currentList, new Comparator<Incidencia>() {
+                 @Override
+                 public int compare(Incidencia o1, Incidencia o2) {
+                     int p1 = getUrgencyPriority(o1.getUrgencia());
+                     int p2 = getUrgencyPriority(o2.getUrgencia());
+                     return Integer.compare(p1, p2);
+                 }
+                 
+                 private int getUrgencyPriority(String urgencia) {
+                     if (urgencia == null) return 4;
+                     switch (urgencia.toLowerCase()) {
+                         case "alta": return 1;
+                         case "media": return 2;
+                         case "baja": return 3;
+                         default: return 4;
+                     }
+                 }
+             });
+             adapter.updateData(currentList);
+             recyclerView.scrollToPosition(0);
+         }
+    }
+
+    // Launcher para permisos de ubicación
+    private final androidx.activity.result.ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            isGranted -> {
+                if (isGranted) {
+                    getUserLocationAndSort();
+                } else {
+                    android.widget.Toast.makeText(this, "Permiso de ubicación necesario para ordenar por cercanía", android.widget.Toast.LENGTH_LONG).show();
+                    chipGroupSort.check(R.id.chipUrgency);
+                }
+            });
 
     /**
      * Ciclo de vida: onDestroy

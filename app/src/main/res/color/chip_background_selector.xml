@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Estado Seleccionado: Color Primario (Verde Elegante) -->
+    <item android:color="@color/colorPrimary" android:state_checked="true" />
+    
+    <!-- Estado Normal: Gris muy suave (Minimalista) -->
+    <item android:color="@color/colorSurfaceVariant" />
+</selector>

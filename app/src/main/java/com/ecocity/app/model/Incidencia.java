@@ -9,6 +9,8 @@ import java.io.Serializable;
  */
 public class Incidencia implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     // Identificador único de la incidencia en la base de datos (Firestore usa
     // String)
     private String id;

@@ -19,7 +19,7 @@ import java.util.List;
 public class IncidenciaDAO {
 
     private com.google.firebase.firestore.FirebaseFirestore db;
-    private static final String COLLECTION_NAME = "incidencias";
+    private static final String COLLECTION_NAME = "incidencias_v2";
 
     /**
      * Interfaz para recibir resultados asíncronos de Firestore.

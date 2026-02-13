@@ -245,13 +245,12 @@
                             android:layout_marginStart="12dp"/>
                     </LinearLayout>
 
-                    <!-- Map View (Lite Mode) para mostrar ubicación estática -->
-                    <com.google.android.gms.maps.MapView
-                        android:id="@+id/mapView"
+                    <!-- Contenedor para Map View (Carga Dinámica) -->
+                    <FrameLayout
+                        android:id="@+id/mapContainer"
                         android:layout_width="match_parent"
                         android:layout_height="150dp"
-                        android:layout_marginTop="8dp"
-                        app:liteMode="true"/>
+                        android:layout_marginTop="8dp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

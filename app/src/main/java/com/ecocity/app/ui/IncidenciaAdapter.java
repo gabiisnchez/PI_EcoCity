@@ -392,10 +392,16 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             // Navegación al pulsar el item
             itemView.setOnClickListener(v -> {
-                android.content.Context context = v.getContext();
-                android.content.Intent intent = new android.content.Intent(context, DetailIncidenciaActivity.class);
-                intent.putExtra("incidencia", incidencia);
-                context.startActivity(intent);
+                try {
+                    android.content.Context context = v.getContext();
+                    android.content.Intent intent = new android.content.Intent(context, DetailIncidenciaActivity.class);
+                    intent.putExtra("incidencia", incidencia);
+                    context.startActivity(intent);
+                } catch (Exception e) {
+                    android.util.Log.e("IncidenciaAdapter", "Error al abrir detalle: " + e.getMessage());
+                    e.printStackTrace();
+                    android.widget.Toast.makeText(itemView.getContext(), "Error abriendo incidencia: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+                }
             });
         }
     }

@@ -245,22 +245,40 @@ public class LoginActivity extends AppCompatActivity {
 
                         user.updateProfile(profileUpdates)
                                 .addOnCompleteListener(task1 -> {
-                                    btnLogin.setEnabled(true);
                                     if (task1.isSuccessful()) {
-                                        // IMPORTANTE: No iniciar sesión automáticamente.
-                                        // Cerrar la sesión de Firebase inmediatamente.
-                                        mAuth.signOut();
+                                        // Guardar usuario en Firestore
+                                        com.google.firebase.firestore.FirebaseFirestore db = com.google.firebase.firestore.FirebaseFirestore.getInstance();
+                                        // AHORA: Guardamos nombre y apellidos separados
+                                        com.ecocity.app.model.Usuario nuevoUsuario = new com.ecocity.app.model.Usuario(user.getUid(), name, apellidos, email);
 
-                                        Toast.makeText(LoginActivity.this,
-                                                "Registro exitoso. Por favor, inicia sesión.",
-                                                Toast.LENGTH_LONG).show();
+                                        db.collection("usuarios").document(user.getUid())
+                                                .set(nuevoUsuario)
+                                                .addOnSuccessListener(aVoid -> {
+                                                    btnLogin.setEnabled(true);
+                                                    // IMPORTANTE: No iniciar sesión automáticamente.
+                                                    // Cerrar la sesión de Firebase inmediatamente.
+                                                    mAuth.signOut();
 
-                                        // Limpiar campos y volver al modo Login
-                                        etEmail.setText("");
-                                        etPassword.setText("");
-                                        etName.setText("");
-                                        etSurnames.setText("");
-                                        toggleMode();
+                                                    Toast.makeText(LoginActivity.this,
+                                                            "Registro exitoso. Por favor, inicia sesión.",
+                                                            Toast.LENGTH_LONG).show();
+
+                                                    // Limpiar campos y volver al modo Login
+                                                    etEmail.setText("");
+                                                    etPassword.setText("");
+                                                    etName.setText("");
+                                                    etSurnames.setText("");
+                                                    toggleMode();
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    btnLogin.setEnabled(true);
+                                                    Toast.makeText(LoginActivity.this,
+                                                            "Usuario creado, pero error al guardar datos: " + e.getMessage(),
+                                                            Toast.LENGTH_LONG).show();
+                                                });
+                                    } else {
+                                        btnLogin.setEnabled(true);
+                                        Toast.makeText(LoginActivity.this, "Error al actualizar perfil.", Toast.LENGTH_SHORT).show();
                                     }
                                 });
                     } else {

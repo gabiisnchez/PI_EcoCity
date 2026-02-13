@@ -64,9 +64,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="8dp"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
         android:background="@android:color/white"
         android:elevation="8dp"
+        android:gravity="center_vertical"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <EditText
@@ -89,7 +91,8 @@
             android:src="@android:drawable/ic_menu_send"
             app:backgroundTint="@color/colorPrimary"
             app:tint="@android:color/white"
-            app:elevation="2dp"
+            app:elevation="4dp"
+            app:useCompatPadding="true"
             app:fabSize="mini"/>
     </LinearLayout>
 

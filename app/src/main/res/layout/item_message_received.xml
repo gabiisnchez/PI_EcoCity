@@ -16,27 +16,23 @@
         app:cardCornerRadius="16dp"
         app:cardElevation="2dp"
         app:cardBackgroundColor="@color/colorMessageReceivedBg"
+        app:contentPadding="12dp"
+        app:cardUseCompatPadding="true"
+        android:layout_margin="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintWidth_percent="0.8"
-        android:layout_marginStart="8dp">
+        app:layout_constrainedWidth="true">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/tvMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="12dp">
+            android:maxWidth="280dp"
+            android:text="Mensaje de prueba recibido"
+            android:textSize="16sp"
+            android:textColor="@color/colorMessageReceivedText"/>
 
-            <TextView
-                android:id="@+id/tvMessage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Mensaje de prueba recibido"
-                android:textSize="16sp"
-                android:textColor="@color/colorMessageReceivedText"/>
-        </LinearLayout>
     </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

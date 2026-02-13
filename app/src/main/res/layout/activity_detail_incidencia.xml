@@ -29,20 +29,26 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
-        <!-- Botón Atrás Flotante -->
-        <ImageButton
+        <!-- Botón Atrás Flotante (Circular Limpio) -->
+        <androidx.cardview.widget.CardView
             android:id="@+id/btnBack"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:src="@drawable/ic_arrow_back"
-            android:background="@drawable/circle_background"
-            android:backgroundTint="#80000000"
-            android:padding="12dp"
-            app:tint="@android:color/white"
+            app:cardCornerRadius="24dp"
+            app:cardBackgroundColor="#80000000"
+            app:cardElevation="0dp"
             android:layout_margin="16dp"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:elevation="4dp"/>
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_arrow_back"
+                android:padding="12dp"
+                app:tint="@android:color/white"
+                android:scaleType="centerInside"/>
+        </androidx.cardview.widget.CardView>
 
         <!-- Curva decorativa inferior de la imagen -->
         <View

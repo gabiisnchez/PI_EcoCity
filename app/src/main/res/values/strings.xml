@@ -44,6 +44,7 @@
 
     <!-- Gestión de Incidencias (Add/Edit) -->
     <string name="title_activity_add_incidencia">Nueva Incidencia</string>
+    <string name="title_activity_edit_incidencia">Editar Incidencia</string>
     <string name="hint_title">Título de la incidencia</string>
     <string name="hint_description">Descripción del problema</string>
     <string name="label_urgency">Nivel de Urgencia</string>

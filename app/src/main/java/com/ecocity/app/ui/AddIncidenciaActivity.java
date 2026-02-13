@@ -75,6 +75,9 @@ public class AddIncidenciaActivity extends AppCompatActivity {
 
     // TextView para mostrar coordenadas o estado de la ubicación
     private android.widget.TextView tvLocationStatusDetail;
+    
+    // Título de la cabecera
+    private android.widget.TextView tvHeader;
 
     // Botones de acción principal
     private Button btnSave; // Guardar o Actualizar
@@ -142,7 +145,11 @@ public class AddIncidenciaActivity extends AppCompatActivity {
         spinnerUrgencia = findViewById(R.id.spinnerUrgencia);
         layoutEstado = findViewById(R.id.layoutEstado);
         spinnerEstado = findViewById(R.id.spinnerEstado);
+        spinnerUrgencia = findViewById(R.id.spinnerUrgencia);
+        layoutEstado = findViewById(R.id.layoutEstado);
+        spinnerEstado = findViewById(R.id.spinnerEstado);
         tvLocationStatusDetail = findViewById(R.id.tvLocationStatusDetail);
+        tvHeader = findViewById(R.id.tvHeader);
 
         // Botón Atrás (Toolbar personalizada)
         android.widget.ImageButton btnBack = findViewById(R.id.btnBack);
@@ -476,6 +483,11 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             // Cambiar texto de botón para reflejar acción
             btnSave.setText(getString(R.string.btn_update));
             btnDelete.setVisibility(View.VISIBLE);
+            
+            // Cambiar título de cabecera
+            if (tvHeader != null) {
+                tvHeader.setText(getString(R.string.title_activity_edit_incidencia));
+            }
         }
     }
 

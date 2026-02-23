@@ -48,7 +48,7 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
     private TextView tvTitulo, tvDescripcion, tvUrgencia, tvEstado, tvLocationText, tvUserEmail;
     private CardView cardUrgencia, cardEstado;
     private ImageView ivEstadoIcon, ivHeader;
-    private FloatingActionButton fabEdit;
+    private FloatingActionButton fabEdit, fabGroupChat;
 
     // Componente de Mapa embebido
     private MapView mapView;
@@ -87,7 +87,7 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
         ivEstadoIcon = findViewById(R.id.ivEstadoIcon);
         ivHeader = findViewById(R.id.ivHeader);
         fabEdit = findViewById(R.id.fabEdit);
-
+        fabGroupChat = findViewById(R.id.fabGroupChat);
 
         // 2. Inicializar MapView (AHORA DINÁMICO en setupLocation)
         // No hacemos nada aquí para evitar crashes de inflación
@@ -108,9 +108,10 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
             try {
                 setupUI(); // Rellenar la interfaz con los datos
             } catch (Exception e) {
-                 android.util.Log.e("DetailIncidencia", "Error crítico en setupUI: " + e.getMessage());
-                 e.printStackTrace();
-                 android.widget.Toast.makeText(this, "Error mostrando detalles", android.widget.Toast.LENGTH_SHORT).show();
+                android.util.Log.e("DetailIncidencia", "Error crítico en setupUI: " + e.getMessage());
+                e.printStackTrace();
+                android.widget.Toast.makeText(this, "Error mostrando detalles", android.widget.Toast.LENGTH_SHORT)
+                        .show();
             }
         } else {
             android.widget.Toast.makeText(this, "Error cargando incidencia", android.widget.Toast.LENGTH_SHORT).show();
@@ -127,6 +128,17 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
                 intent.putExtra("incidencia_id", incidencia.getId()); // ID explícito por seguridad
                 startActivity(intent);
                 finish(); // Cerramos detalle para que al volver de editar vayamos a la lista renovada
+            }
+        });
+
+        // 5. Configurar Botón de Chat Grupal (TCP Sockets)
+        fabGroupChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DetailIncidenciaActivity.this, IncidenceChatActivity.class);
+                intent.putExtra("incidencia_id", incidencia.getId());
+                intent.putExtra("incidencia_titulo", incidencia.getTitulo());
+                startActivity(intent);
             }
         });
     }
@@ -237,41 +249,47 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
      * Configura el mapa si hay ubicación registrada.
      */
     private void setupLocation() {
-        if (incidencia == null) return;
-        
+        if (incidencia == null)
+            return;
+
         try {
             if (incidencia.getLatitud() != 0.0 || incidencia.getLongitud() != 0.0) {
                 // Mostrar coordenadas
                 if (tvLocationText != null) {
                     tvLocationText.setText(String.format(getString(R.string.detail_location_title),
-                            String.format("%.4f", incidencia.getLatitud()), String.format("%.4f", incidencia.getLongitud())));
-                    tvLocationText.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.urgency_low)); 
+                            String.format("%.4f", incidencia.getLatitud()),
+                            String.format("%.4f", incidencia.getLongitud())));
+                    tvLocationText
+                            .setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.urgency_low));
                 }
-    
+
                 // Mostrar Mapa Dinámicamente
                 android.widget.FrameLayout mapContainer = findViewById(R.id.mapContainer);
                 if (mapContainer != null) {
                     try {
                         // Crear MapView programáticamente
-                        com.google.android.gms.maps.GoogleMapOptions options = new com.google.android.gms.maps.GoogleMapOptions().liteMode(true);
+                        com.google.android.gms.maps.GoogleMapOptions options = new com.google.android.gms.maps.GoogleMapOptions()
+                                .liteMode(true);
                         mapView = new com.google.android.gms.maps.MapView(this, options);
-                        
+
                         // Añadir al contenedor
                         mapContainer.removeAllViews();
                         mapContainer.addView(mapView);
-                        
+
                         // Iniciar ciclo de vida MANUALMENTE
                         mapView.onCreate(null); // Bundle nulo es seguro aquí
                         mapView.onResume(); // Necesario para que se muestre inmediatamente
-                        
+
                         mapView.getMapAsync(new OnMapReadyCallback() {
                             @Override
                             public void onMapReady(GoogleMap googleMap) {
-                                if (googleMap == null) return;
+                                if (googleMap == null)
+                                    return;
                                 try {
                                     LatLng location = new LatLng(incidencia.getLatitud(), incidencia.getLongitud());
                                     googleMap.addMarker(
-                                            new MarkerOptions().position(location).title(getString(R.string.subtitle_incidencia)));
+                                            new MarkerOptions().position(location)
+                                                    .title(getString(R.string.subtitle_incidencia)));
                                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f));
                                     googleMap.getUiSettings().setMapToolbarEnabled(false);
                                 } catch (Exception ex) {
@@ -298,7 +316,7 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
                 }
             }
         } catch (Exception e) {
-             android.util.Log.e("DetailIncidencia", "Error en setupLocation: " + e.getMessage());
+            android.util.Log.e("DetailIncidencia", "Error en setupLocation: " + e.getMessage());
         }
     }
 

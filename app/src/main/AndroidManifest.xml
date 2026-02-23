@@ -81,6 +81,9 @@
         
         <!-- Selección de Ubicación en Mapa -->
         <activity android:name=".ui.MapActivity" android:exported="false" android:label="Seleccionar Ubicación"/>
+
+        <!-- Chat Grupal por Incidencia (TCP Sockets) -->
+        <activity android:name=".ui.IncidenceChatActivity" android:exported="false" android:label="Chat de la Incidencia" android:windowSoftInputMode="adjustResize"/>
         
         <!-- Perfil de Usuario -->
         <activity android:name=".ui.ProfileActivity" android:exported="false" android:label="Mi Perfil"/>

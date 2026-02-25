@@ -4,6 +4,7 @@
   <img src="https://img.shields.io/badge/Plataforma-Android-3DDC84?style=flat&logo=android&logoColor=white" alt="Android">
   <img src="https://img.shields.io/badge/Lenguaje-Java-007396?style=flat&logo=java&logoColor=white" alt="Java">
   <img src="https://img.shields.io/badge/Base_de_Datos-SQLite_%7C_Firestore-FFCA28?style=flat&logo=firebase&logoColor=black" alt="BBDD">
+  <img src="https://img.shields.io/badge/Inteligencia_Artificial-Gemini_AI-1A73E8?style=flat&logo=googlebard&logoColor=white" alt="AI">
   <img src="https://img.shields.io/badge/Arquitectura-Offline--First-blueviolet?style=flat" alt="Arch">
 </p>
 
@@ -44,6 +45,7 @@ La aplicación está diseñada bajo una arquitectura **resiliente y Offline-Firs
 *   📸 **Soporte Multimedia & Hardware:** Integración nativa con la cámara del dispositivo usando `FileProvider` y `ActivityResultContracts` para adjuntar pruebas fotográficas.
 *   🗺️ **Geolocalización Nativa:** Integración con Google Maps SDK y Location Services (GPS) para indicar y visualizar el punto exacto de la incidencia, ordenando el listado por cercanía.
 *   💬 **Chat de Soporte en Tiempo Real:** Implementación de una sala de chat grupal técnica usando conexiones de sockets TCP puras en **Java (Clases Socket/ServerSocket)**, demostrando control de red de bajo nivel.
+*   🤖 **Asistente Virtual con IA:** Integración nativa con la **API REST de Google Gemini (Generative AI)**. El soporte técnico cuenta tus incidencias asíncronamente en SQLite y nutre de contexto en tiempo real al modelo de lenguaje para darte respuestas precisas.
 *   🎨 **Diseño Material:** Interfaz limpia, minimalista e intuitiva respetando las guías de Material Design de Google (Edge-to-Edge, Componentes MUI).
 
 ---
@@ -57,7 +59,8 @@ El proyecto abarca tecnologías modernas de desarrollo Android y servicios BaaS,
 | **Desarrollo Móvil (PMDM / DI)** | `Java`, `Android SDK`, `Material Design Components`, `Activity Result API` |
 | **Acceso a Datos (AD)** | `SQLiteOpenHelper`, `Cursor`, Listas en Memoria, `ContentValues` |
 | **Servicios en la Nube** | `Firebase Authentication`, `Cloud Firestore (NoSQL)` |
-| **Servicios y Procesos (PSP)** | `Threads / Runnables`, `Concurrencia GUI (runOnUiThread)`, Sockets TCP |
+| **APIs REST & Inteligencia Artificial** | `Google Gemini API (Generative Language)`, `Retrofit 2`, `Gson` |
+| **Servicios y Procesos (PSP)** | `Threads / Runnables`, `Concurrencia GUI (runOnUiThread)`, Sockets TCP, Callbacks asíncronos |
 | **Sensores y APIs Externas** | `Google Maps API`, `Fused Location Provider`, Cámara |
 
 ### 🏗️ Sincronización (Offline-First)

@@ -12,7 +12,19 @@ import com.ecocity.app.R;
 import com.ecocity.app.model.Mensaje;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import com.ecocity.app.api.GeminiApiService;
+import com.ecocity.app.api.GeminiRequest;
+import com.ecocity.app.api.GeminiResponse;
+import com.ecocity.app.database.IncidenciaDAO;
+import android.util.Log;
 
 /**
  * <h1>ChatActivity</h1>
@@ -36,6 +48,10 @@ public class ChatActivity extends AppCompatActivity {
     private FloatingActionButton btnSend;
     private ChatAdapter adapter;
     private List<Mensaje> messageList;
+
+    // Configuración API Gemini
+    private GeminiApiService geminiApiService;
+    private static final String GEMINI_API_KEY = "AIzaSyDBOrbO99Jue5dIEPYubiubxrP_ZwCQUDs";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +77,13 @@ public class ChatActivity extends AppCompatActivity {
         messageList = new ArrayList<>();
         // Mensaje de bienvenida inicial
         messageList.add(new Mensaje(getString(R.string.chat_welcome_message), false));
+
+        // Inicializar Retrofit para llamadas a Gemini
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://generativelanguage.googleapis.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        geminiApiService = retrofit.create(GeminiApiService.class);
 
         // Configuración del Adapter y RecyclerView
         adapter = new ChatAdapter(messageList);
@@ -91,25 +114,99 @@ public class ChatActivity extends AppCompatActivity {
             rvChat.scrollToPosition(messageList.size() - 1);
             etMessage.setText("");
 
-            // 2. Simular respuesta del sistema
-            simulateSupportReply();
+            // 2. Llamar a Gemini API
+            callGeminiAPI(text);
         }
     }
 
     /**
-     * Simula una respuesta del soporte técnico tras un breve retraso.
-     * Utiliza un Handler para ejecutar código en el hilo principal después de un
-     * tiempo.
+     * Llama a la API de Google Gemini enviándole el mensaje del usuario más un
+     * contexto del sistema.
      */
-    private void simulateSupportReply() {
-        new Handler().postDelayed(new Runnable() {
+    private void callGeminiAPI(String userText) {
+        // Indicador visual de que el bot está pensando (simulado rápido)
+        messageList.add(new Mensaje("Escribiendo...", false));
+        final int typingIndex = messageList.size() - 1;
+        adapter.notifyItemInserted(typingIndex);
+        rvChat.scrollToPosition(typingIndex);
+
+        // 1. Obtener contexto de la base de datos (cuántas incidencias hay para que
+        // Gemini lo sepa)
+        IncidenciaDAO dao = new IncidenciaDAO(this);
+        dao.open();
+
+        // La llamada a SQLite a través del DAO ahora es asíncrona mediante Callback
+        dao.getIncidenciasCount(null, null, count -> {
+            dao.close();
+
+            // 2. Construir el Prompt dentro del contexto una vez sabemos el número
+            String prompt = "Eres el asistente virtual de la aplicación Android EcoCity. " +
+                    "Tu objetivo es dar soporte al ciudadano que reporta incidencias urbanas. " +
+                    "Contexto actual secreto de la app: Hay " + count
+                    + " incidencias registradas en la base de datos local " +
+                    "del usuario ahora mismo. Responde de forma concisa, amable y en español a lo siguiente: "
+                    + userText;
+
+            proceedWithGeminiCall(prompt, typingIndex);
+        });
+    }
+
+    /**
+     * Refactorizado para continuar la cadena asíncrona después de obtener la BBDD.
+     */
+    private void proceedWithGeminiCall(String prompt, int typingIndex) {
+        // 3. Crear el Body de la petición
+        GeminiRequest.Part part = new GeminiRequest.Part(prompt);
+        GeminiRequest.Content content = new GeminiRequest.Content(Collections.singletonList(part));
+        GeminiRequest request = new GeminiRequest(Collections.singletonList(content));
+
+        // 4. Ejecutar llamada HTTP asíncrona
+        Call<GeminiResponse> call = geminiApiService.generateContent(GEMINI_API_KEY, request);
+        call.enqueue(new Callback<GeminiResponse>() {
             @Override
-            public void run() {
-                String reply = getString(R.string.chat_auto_reply);
-                messageList.add(new Mensaje(reply, false));
-                adapter.notifyItemInserted(messageList.size() - 1);
-                rvChat.scrollToPosition(messageList.size() - 1);
+            public void onResponse(Call<GeminiResponse> call, Response<GeminiResponse> response) {
+                // Borrar mensaje de "Escribiendo..."
+                messageList.remove(typingIndex);
+                adapter.notifyItemRemoved(typingIndex);
+
+                if (response.isSuccessful() && response.body() != null) {
+                    String geminiReply = response.body().extractText();
+
+                    // Asegurar que actualizamos la UI en el hilo principal
+                    runOnUiThread(() -> {
+                        messageList.add(new Mensaje(geminiReply, false));
+                        adapter.notifyItemInserted(messageList.size() - 1);
+                        rvChat.scrollToPosition(messageList.size() - 1);
+                    });
+                } else {
+                    Log.e("GeminiAPI", "Error: " + response.code() + " " + response.message());
+                    showErrorReply();
+                }
             }
-        }, 1500); // 1.5 segundos de retraso
+
+            @Override
+            public void onFailure(Call<GeminiResponse> call, Throwable t) {
+                Log.e("GeminiAPI", "Failure: " + t.getMessage());
+                // Borrar mensaje de "Escribiendo..." si falla por red
+                runOnUiThread(() -> {
+                    if (typingIndex < messageList.size()
+                            && messageList.get(typingIndex).getTexto().equals("Escribiendo...")) {
+                        messageList.remove(typingIndex);
+                        adapter.notifyItemRemoved(typingIndex);
+                    }
+                    showErrorReply();
+                });
+            }
+        });
+    }
+
+    private void showErrorReply() {
+        runOnUiThread(() -> {
+            messageList.add(new Mensaje(
+                    "Lo siento, los servidores de Inteligencia Artificial están saturados. Inténtelo más tarde.",
+                    false));
+            adapter.notifyItemInserted(messageList.size() - 1);
+            rvChat.scrollToPosition(messageList.size() - 1);
+        });
     }
 }

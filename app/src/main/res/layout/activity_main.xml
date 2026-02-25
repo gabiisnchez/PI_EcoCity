@@ -61,14 +61,6 @@
         Ocupa el espacio restante en la pantalla.
         Tiene padding inferior para evitar que el FAB tape el último elemento.
     -->
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <!-- 
-        Lista de Incidencias (RecyclerView)
-        Ocupa el espacio restante en la pantalla.
-        Tiene padding inferior para evitar que el FAB tape el último elemento.
-    -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="0dp"

@@ -38,8 +38,6 @@ public class LoginActivity extends AppCompatActivity {
     private android.widget.TextView tvToggleMode, tvTitle;
 
     // --- Lógica de Negocio y Datos ---
-    // private com.ecocity.app.database.UserDAO userDAO; // Comentado: Migración a
-    // Firebase
     private boolean isLoginMode = true;
     private com.ecocity.app.utils.SessionManager session;
 
@@ -67,12 +65,6 @@ public class LoginActivity extends AppCompatActivity {
             launchMainActivity();
             return;
         }
-
-        /*
-         * // 2. Inicialización de Base de Datos (SQLite - Legacy)
-         * userDAO = new com.ecocity.app.database.UserDAO(this);
-         * userDAO.open();
-         */
 
         // 3. Configuración de UI
         androidx.activity.EdgeToEdge.enable(this);
@@ -247,9 +239,11 @@ public class LoginActivity extends AppCompatActivity {
                                 .addOnCompleteListener(task1 -> {
                                     if (task1.isSuccessful()) {
                                         // Guardar usuario en Firestore
-                                        com.google.firebase.firestore.FirebaseFirestore db = com.google.firebase.firestore.FirebaseFirestore.getInstance();
+                                        com.google.firebase.firestore.FirebaseFirestore db = com.google.firebase.firestore.FirebaseFirestore
+                                                .getInstance();
                                         // AHORA: Guardamos nombre y apellidos separados
-                                        com.ecocity.app.model.Usuario nuevoUsuario = new com.ecocity.app.model.Usuario(user.getUid(), name, apellidos, email);
+                                        com.ecocity.app.model.Usuario nuevoUsuario = new com.ecocity.app.model.Usuario(
+                                                user.getUid(), name, apellidos, email);
 
                                         db.collection("usuarios").document(user.getUid())
                                                 .set(nuevoUsuario)
@@ -273,12 +267,14 @@ public class LoginActivity extends AppCompatActivity {
                                                 .addOnFailureListener(e -> {
                                                     btnLogin.setEnabled(true);
                                                     Toast.makeText(LoginActivity.this,
-                                                            "Usuario creado, pero error al guardar datos: " + e.getMessage(),
+                                                            "Usuario creado, pero error al guardar datos: "
+                                                                    + e.getMessage(),
                                                             Toast.LENGTH_LONG).show();
                                                 });
                                     } else {
                                         btnLogin.setEnabled(true);
-                                        Toast.makeText(LoginActivity.this, "Error al actualizar perfil.", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(LoginActivity.this, "Error al actualizar perfil.",
+                                                Toast.LENGTH_SHORT).show();
                                     }
                                 });
                     } else {

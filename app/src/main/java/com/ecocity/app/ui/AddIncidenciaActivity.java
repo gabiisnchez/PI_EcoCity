@@ -270,8 +270,10 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                         currentLng = result.getData().getDoubleExtra("lng", 0.0);
 
                         // Actualizamos UI con feedback visual (Texto y Color)
-                        tvLocationStatusDetail.setText(String.format(getString(R.string.text_location_registered),
-                                String.format("%.4f", currentLat), String.format("%.4f", currentLng)));
+                        tvLocationStatusDetail
+                                .setText(String.format(Locale.US, getString(R.string.text_location_registered),
+                                        String.format(Locale.US, "%.4f", currentLat),
+                                        String.format(Locale.US, "%.4f", currentLng)));
                         tvLocationStatusDetail.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
 
                         // Mostrar visualmente en mapa
@@ -472,8 +474,8 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             if (incidenciaToEdit.getLatitud() != 0.0 || incidenciaToEdit.getLongitud() != 0.0) {
                 currentLat = incidenciaToEdit.getLatitud();
                 currentLng = incidenciaToEdit.getLongitud();
-                tvLocationStatusDetail.setText(String.format(getString(R.string.text_location_registered),
-                        String.format("%.4f", currentLat), String.format("%.4f", currentLng)));
+                tvLocationStatusDetail.setText(String.format(Locale.US, getString(R.string.text_location_registered),
+                        String.format(Locale.US, "%.4f", currentLat), String.format(Locale.US, "%.4f", currentLng)));
                 tvLocationStatusDetail.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
                 setupLocationPreview();
             } else {

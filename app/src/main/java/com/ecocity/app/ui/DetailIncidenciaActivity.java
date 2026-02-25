@@ -195,11 +195,11 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
      */
     private void setupUrgencyChip() {
         String urgency = incidencia.getUrgencia() != null ? incidencia.getUrgencia() : "Baja";
-        tvUrgencia.setText(urgency.toUpperCase());
+        tvUrgencia.setText(urgency.toUpperCase(java.util.Locale.getDefault()));
 
         int color;
         // Asignar colores según nivel de urgencia
-        switch (urgency.toLowerCase()) {
+        switch (urgency.toLowerCase(java.util.Locale.getDefault())) {
             case "alta":
                 color = androidx.core.content.ContextCompat.getColor(this, R.color.urgency_high_bg);
                 tvUrgencia.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.urgency_high));
@@ -221,7 +221,7 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
      */
     private void setupStatusChip() {
         String estado = incidencia.getEstado() != null ? incidencia.getEstado() : "Pendiente";
-        tvEstado.setText(estado.toUpperCase());
+        tvEstado.setText(estado.toUpperCase(java.util.Locale.getDefault()));
 
         int bgRes, textRes, iconRes;
 
@@ -256,9 +256,9 @@ public class DetailIncidenciaActivity extends AppCompatActivity {
             if (incidencia.getLatitud() != 0.0 || incidencia.getLongitud() != 0.0) {
                 // Mostrar coordenadas
                 if (tvLocationText != null) {
-                    tvLocationText.setText(String.format(getString(R.string.detail_location_title),
-                            String.format("%.4f", incidencia.getLatitud()),
-                            String.format("%.4f", incidencia.getLongitud())));
+                    tvLocationText.setText(String.format(java.util.Locale.US, getString(R.string.detail_location_title),
+                            String.format(java.util.Locale.US, "%.4f", incidencia.getLatitud()),
+                            String.format(java.util.Locale.US, "%.4f", incidencia.getLongitud())));
                     tvLocationText
                             .setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.urgency_low));
                 }

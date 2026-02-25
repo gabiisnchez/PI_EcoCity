@@ -128,62 +128,67 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         for (Incidencia inc : newIncidencias) {
             String statusRaw = inc.getEstado() != null ? inc.getEstado() : "Pendiente";
             String statusKey = "Pendiente";
-            if (statusRaw.equalsIgnoreCase("En proceso")) statusKey = "En Proceso";
-            else if (statusRaw.equalsIgnoreCase("Resuelta")) statusKey = "Resuelta";
+            if (statusRaw.equalsIgnoreCase("En proceso"))
+                statusKey = "En Proceso";
+            else if (statusRaw.equalsIgnoreCase("Resuelta"))
+                statusKey = "Resuelta";
             groupedIncidencias.get(statusKey).add(inc);
         }
 
         // Reconstruir lista nueva
         buildDisplayList();
-        
+
         // Calcular diferencias y animar
-        androidx.recyclerview.widget.DiffUtil.DiffResult diffResult = androidx.recyclerview.widget.DiffUtil.calculateDiff(new androidx.recyclerview.widget.DiffUtil.Callback() {
-            @Override
-            public int getOldListSize() {
-                return oldDisplayList.size();
-            }
+        androidx.recyclerview.widget.DiffUtil.DiffResult diffResult = androidx.recyclerview.widget.DiffUtil
+                .calculateDiff(new androidx.recyclerview.widget.DiffUtil.Callback() {
+                    @Override
+                    public int getOldListSize() {
+                        return oldDisplayList.size();
+                    }
 
-            @Override
-            public int getNewListSize() {
-                return displayList.size();
-            }
+                    @Override
+                    public int getNewListSize() {
+                        return displayList.size();
+                    }
 
-            @Override
-            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-                Object oldItem = oldDisplayList.get(oldItemPosition);
-                Object newItem = displayList.get(newItemPosition);
-                
-                // Si son cabeceras (String), comparar texto
-                if (oldItem instanceof String && newItem instanceof String) {
-                    return oldItem.equals(newItem);
-                }
-                
-                // Si son incidencias, comparar ID único
-                if (oldItem instanceof Incidencia && newItem instanceof Incidencia) {
-                    String id1 = ((Incidencia) oldItem).getId();
-                    String id2 = ((Incidencia) newItem).getId();
-                    return id1 != null && id1.equals(id2);
-                }
-                
-                return false;
-            }
+                    @Override
+                    public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                        Object oldItem = oldDisplayList.get(oldItemPosition);
+                        Object newItem = displayList.get(newItemPosition);
 
-            @Override
-            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                Object oldItem = oldDisplayList.get(oldItemPosition);
-                Object newItem = displayList.get(newItemPosition);
-                
-                if (oldItem instanceof String) return true; // Cabeceras no cambian de contenido interno
-                
-                // Comparar campos relevantes para visualización
-                Incidencia i1 = (Incidencia) oldItem;
-                Incidencia i2 = (Incidencia) newItem;
-                // Simplificación: si título y estado son iguales. Para exactitud, comparar todo.
-                return i1.getTitulo().equals(i2.getTitulo()) && 
-                       i1.getEstado().equals(i2.getEstado()) &&
-                       i1.getUrgencia().equals(i2.getUrgencia());
-            }
-        });
+                        // Si son cabeceras (String), comparar texto
+                        if (oldItem instanceof String && newItem instanceof String) {
+                            return oldItem.equals(newItem);
+                        }
+
+                        // Si son incidencias, comparar ID único
+                        if (oldItem instanceof Incidencia && newItem instanceof Incidencia) {
+                            String id1 = ((Incidencia) oldItem).getId();
+                            String id2 = ((Incidencia) newItem).getId();
+                            return id1 != null && id1.equals(id2);
+                        }
+
+                        return false;
+                    }
+
+                    @Override
+                    public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                        Object oldItem = oldDisplayList.get(oldItemPosition);
+                        Object newItem = displayList.get(newItemPosition);
+
+                        if (oldItem instanceof String)
+                            return true; // Cabeceras no cambian de contenido interno
+
+                        // Comparar campos relevantes para visualización
+                        Incidencia i1 = (Incidencia) oldItem;
+                        Incidencia i2 = (Incidencia) newItem;
+                        // Simplificación: si título y estado son iguales. Para exactitud, comparar
+                        // todo.
+                        return i1.getTitulo().equals(i2.getTitulo()) &&
+                                i1.getEstado().equals(i2.getEstado()) &&
+                                i1.getUrgencia().equals(i2.getUrgencia());
+                    }
+                });
 
         diffResult.dispatchUpdatesTo(this);
     }
@@ -368,7 +373,7 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             int urgencyBgColor;
             String urgencia = incidencia.getUrgencia() != null ? incidencia.getUrgencia() : "Baja";
 
-            switch (urgencia.toLowerCase()) {
+            switch (urgencia.toLowerCase(java.util.Locale.getDefault())) {
                 case "alta":
                     urgencyColor = androidx.core.content.ContextCompat.getColor(itemView.getContext(),
                             R.color.urgency_high);
@@ -449,7 +454,8 @@ public class IncidenciaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 } catch (Exception e) {
                     android.util.Log.e("IncidenciaAdapter", "Error al abrir detalle: " + e.getMessage());
                     e.printStackTrace();
-                    android.widget.Toast.makeText(itemView.getContext(), "Error abriendo incidencia: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+                    android.widget.Toast.makeText(itemView.getContext(), "Error abriendo incidencia: " + e.getMessage(),
+                            android.widget.Toast.LENGTH_SHORT).show();
                 }
             });
         }

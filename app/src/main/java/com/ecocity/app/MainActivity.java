@@ -272,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
                 private int getUrgencyPriority(String urgencia) {
                     if (urgencia == null)
                         return 4;
-                    switch (urgencia.toLowerCase()) {
+                    switch (urgencia.toLowerCase(java.util.Locale.getDefault())) {
                         case "alta":
                             return 1;
                         case "media":

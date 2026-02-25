@@ -68,11 +68,12 @@
 
     <!-- Detalle de Incidencia -->
     <string name="detail_unknown_user">Desconocido</string>
+    <string name="detail_created_by">Creado Por</string>
     <string name="detail_no_location">Sin ubicación</string>
     <string name="detail_location_title">Ubicación Registrada\nLat: %1$s, Lon: %2$s</string>
 
     <!-- Mapa -->
-    <string name="map_search_hint">Buscar dirección...</string>
+    <string name="map_search_hint">Buscar dirección…</string>
     <string name="map_btn_confirm">Confirmar Ubicación</string>
     <string name="map_msg_enter_address">Introduce una dirección</string>
     <string name="map_msg_not_found">No se encontró la ubicación</string>
@@ -80,15 +81,17 @@
 
     <!-- Perfil -->
     <string name="profile_title">Perfil de Usuario</string>
+    <string name="profile_account_section">Cuenta</string>
     <string name="profile_stats_total">Total Incidencias</string>
     <string name="profile_stats_resolved">Resueltas</string>
     <string name="profile_stats_process">En Proceso</string>
     <string name="profile_stats_pending">Pendientes</string>
     <string name="btn_logout">Cerrar Sesión</string>
     
-    <!-- Chat -->
     <string name="chat_title">Soporte EcoCity</string>
-    <string name="chat_hint_message">Escribe un mensaje...</string>
+    <string name="chat_incidence_title">Chat Incidencia</string>
+    <string name="chat_group_hint">Escribe al grupo…</string>
+    <string name="chat_hint_message">Escribe un mensaje…</string>
     <string name="chat_welcome_message">¡Hola! Soy el asistente virtual de EcoCity. ¿En qué puedo ayudarte hoy?</string>
     <string name="chat_auto_reply">Gracias por tu mensaje. Un operador revisará tu consulta en breve.</string>
 

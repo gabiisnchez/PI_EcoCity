@@ -39,7 +39,7 @@
         android:layout_marginTop="56dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:contentDescription="Perfil" />
+        android:contentDescription="@string/content_desc_profile" />
 
     <!-- Subtítulo Informativo -->
     <TextView
@@ -97,7 +97,7 @@
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Urgencia"
+            android:text="@string/urgency_low"
             app:chipIcon="@android:drawable/ic_menu_sort_by_size"
             android:checked="true"
             android:stateListAnimator="@animator/chip_scale"
@@ -110,7 +110,7 @@
             style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cercanas"
+            android:text="@string/map_btn_confirm"
             app:chipIcon="@android:drawable/ic_menu_mylocation"
             android:stateListAnimator="@animator/chip_scale"
             app:chipBackgroundColor="@color/chip_background_selector" 
@@ -169,7 +169,7 @@
         android:src="@android:drawable/ic_menu_help"
         app:layout_constraintBottom_toTopOf="@+id/fabAdd"
         app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="Soporte"
+        android:contentDescription="@string/content_desc_support"
         app:tint="@color/colorPrimary"
         app:backgroundTint="@color/white"
         app:elevation="6dp"/>

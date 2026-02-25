@@ -5,6 +5,7 @@
 -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -54,7 +55,7 @@
             android:id="@+id/tvUserName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nombre de Usuario"
+            tools:text="Nombre de Usuario"
             android:textColor="@android:color/white"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -63,7 +64,7 @@
             android:id="@+id/tvUserEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="correo@ejemplo.com"
+            tools:text="correo@ejemplo.com"
             android:textColor="#E0E0E0"
             android:textSize="16sp"
             android:layout_marginBottom="24dp"/>
@@ -107,14 +108,14 @@
                         android:id="@+id/tvCountTotal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0"
+                        tools:text="0"
                         android:textSize="28sp"
                         android:textStyle="bold"
                         android:textColor="#EF6C00"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Total"
+                        android:text="@string/profile_stats_total"
                         android:textSize="14sp"
                         android:textColor="#EF6C00"/>
                 </LinearLayout>
@@ -139,14 +140,14 @@
                         android:id="@+id/tvCountResolved"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0"
+                        tools:text="0"
                         android:textSize="28sp"
                         android:textStyle="bold"
                         android:textColor="#2E7D32"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Resueltas"
+                        android:text="@string/profile_stats_resolved"
                         android:textSize="14sp"
                         android:textColor="#2E7D32"/>
                 </LinearLayout>
@@ -179,14 +180,14 @@
                         android:id="@+id/tvCountProcess"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0"
+                        tools:text="0"
                         android:textSize="28sp"
                         android:textStyle="bold"
                         android:textColor="#0277BD"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="En Proceso"
+                        android:text="@string/profile_stats_process"
                         android:textSize="14sp"
                         android:textColor="#0277BD"/>
                 </LinearLayout>
@@ -211,14 +212,14 @@
                         android:id="@+id/tvCountPending"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0"
+                        tools:text="0"
                         android:textSize="28sp"
                         android:textStyle="bold"
                         android:textColor="#757575"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Pendientes"
+                        android:text="@string/profile_stats_pending"
                         android:textSize="14sp"
                         android:textColor="#757575"/>
                 </LinearLayout>
@@ -248,7 +249,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cuenta"
+                android:text="@string/profile_account_section"
                 android:textColor="@color/colorPrimary"
                 android:textStyle="bold"
                 android:textSize="18sp"
@@ -258,7 +259,7 @@
                 android:id="@+id/btnLogout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Cerrar Sesión"
+                android:text="@string/btn_logout"
                 android:background="@drawable/button_rounded"
                 app:backgroundTint="#F44336"
                 android:textColor="@android:color/white"

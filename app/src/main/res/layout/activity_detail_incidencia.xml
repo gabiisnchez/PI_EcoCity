@@ -6,6 +6,7 @@
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -81,7 +82,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Título de la Incidencia"
+                    android:text="@string/hint_title"
                     android:textSize="24sp"
                     android:fontFamily="sans-serif-black"
                     android:textColor="@color/colorTextPrimary"/>
@@ -109,7 +110,7 @@
                         android:layout_height="wrap_content"
                         android:paddingHorizontal="12dp"
                         android:paddingVertical="6dp"
-                        android:text="URGENCIA ALTA"
+                        android:text="@string/urgency_high"
                         android:textSize="12sp"
                         android:textStyle="bold"
                         android:textColor="#616161"/>
@@ -141,7 +142,7 @@
                             android:id="@+id/tvEstado"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="EN PROCESO"
+                            android:text="@string/status_in_process"
                             android:textSize="12sp"
                             android:textStyle="bold"
                             android:textColor="#1976D2"/>
@@ -153,7 +154,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="DESCRIPCIÓN"
+                android:text="@string/hint_description"
                 android:textSize="12sp"
                 android:letterSpacing="0.1"
                 android:textColor="#9E9E9E"
@@ -164,7 +165,7 @@
                 android:id="@+id/tvDescripcion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Descripción detallada de la incidencia..."
+                android:text="@string/detail_no_location"
                 android:textSize="16sp"
                 android:textColor="#424242"
                 android:lineSpacingExtra="4dp"
@@ -174,7 +175,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="CREADO POR"
+                android:text="@string/detail_created_by"
                 android:textSize="12sp"
                 android:letterSpacing="0.1"
                 android:textColor="#9E9E9E"
@@ -199,7 +200,7 @@
                     android:id="@+id/tvUserEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="usuario@email.com"
+                    tools:text="usuario@email.com"
                     android:textSize="16sp"
                     android:textColor="#424242"/>
             </LinearLayout>
@@ -208,7 +209,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="UBICACIÓN"
+                android:text="@string/label_location"
                 android:textSize="12sp"
                 android:letterSpacing="0.1"
                 android:textColor="#9E9E9E"
@@ -244,7 +245,7 @@
                             android:id="@+id/tvLocationText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Ubicación Pendiente"
+                            android:text="@string/text_location_pending"
                             android:textSize="16sp"
                             android:textStyle="bold"
                             android:textColor="#424242"

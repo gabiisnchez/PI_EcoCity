@@ -98,7 +98,7 @@
                     android:layout_height="14dp"
                     android:src="@drawable/ic_location_pin"
                     app:tint="@color/colorPrimary"
-                    android:contentDescription="Location"/>
+                    android:contentDescription="@string/label_location"/>
 
                 <TextView
                     android:id="@+id/tvLocationStatus"

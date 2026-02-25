@@ -5,6 +5,7 @@
 -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="8dp">
@@ -32,7 +33,7 @@
                 android:id="@+id/tvSender"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="usuario@email.com"
+                tools:text="usuario@email.com"
                 android:textSize="12sp"
                 android:textStyle="bold"
                 android:textColor="@color/colorPrimary"
@@ -43,7 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:maxWidth="280dp"
-                android:text="Mensaje del grupo"
+                tools:text="Mensaje del grupo"
                 android:textSize="16sp"
                 android:textColor="@color/colorMessageReceivedText"/>
                 

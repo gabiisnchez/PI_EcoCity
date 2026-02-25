@@ -1,16 +1,25 @@
 # 🌱 EcoCity – Ciudad Inteligente
 
-**EcoCity** es una aplicación móvil **Android nativa** diseñada para empoderar a la ciudadanía en la gestión de incidencias urbanas 🏙️. Forma parte de la iniciativa **"Ciudad Inteligente"** del Ayuntamiento, combinando la robustez de los sistemas locales con la flexibilidad de la nube ☁️.
+<p align="center">
+  <img src="https://img.shields.io/badge/Plataforma-Android-3DDC84?style=flat&logo=android&logoColor=white" alt="Android">
+  <img src="https://img.shields.io/badge/Lenguaje-Java-007396?style=flat&logo=java&logoColor=white" alt="Java">
+  <img src="https://img.shields.io/badge/Base_de_Datos-SQLite_%7C_Firestore-FFCA28?style=flat&logo=firebase&logoColor=black" alt="BBDD">
+  <img src="https://img.shields.io/badge/Arquitectura-Offline--First-blueviolet?style=flat" alt="Arch">
+</p>
+
+**EcoCity** es una aplicación móvil **Android nativa** diseñada para empoderar a la ciudadanía en la gestión de incidencias urbanas 🏙️. Forma parte de la iniciativa **"Ciudad Inteligente"** del Ayuntamiento, combinando la robustez de los sistemas locales con la flexibilidad de la nube ☁️. Construida como **Proyecto Integrador (PI)** para el ciclo de Desarrollo de Aplicaciones Multiplataforma (DAM).
 
 ---
 
 ## 📌 Índice
 
 * 🚀 [Contexto del Proyecto](#-contexto-del-proyecto)
-* ⚙️ [Descripción Funcional General](#️-descripción-funcional-general)
+* ✨ [Características Principales](#-características-principales)
+* 🛠️ [Stack Tecnológico y Arquitectura](#️-stack-tecnológico-y-arquitectura)
 * 🗂️ [Estructura del Proyecto](#️-estructura-del-proyecto)
-* ✅ [Estado del Proyecto – Hito 1](#-estado-del-proyecto--hito-1)
-* 🔮 [Próximos Pasos](#-próximos-pasos)
+* 🚀 [Instalación y Ejecución](#-instalación-y-ejecución)
+* 👥 [Autores](#-autores)
+* 📧 [Contacto](#-contacto)
 
 ---
 
@@ -27,37 +36,42 @@ La aplicación está diseñada bajo una arquitectura **resiliente y Offline-Firs
 
 ---
 
-## ⚙️ Descripción Funcional General
+## ✨ Características Principales
 
-La aplicación ofrece las siguientes funcionalidades clave:
+*   🔐 **Autenticación Segura:** Registro e inicio de sesión integrados con Firebase Authentication y perfiles de usuario.
+*   📡 **Arquitectura Offline-First:** La aplicación está diseñada para funcionar sin conexión a internet. Todas las acciones (Crear, Editar, Borrar incidencias) se guardan instantáneamente en una base de datos local SQLite ultrarrápida.
+*   🔄 **Sincronización Inteligente en 2º Plano:** Un monitor de red detecta cuándo vuelve la cobertura e inicia hilos de concurrencia (`Threads`) asíncronos para subir los datos locales a la nube (Firebase Firestore) sin bloquear la interfaz.
+*   📸 **Soporte Multimedia & Hardware:** Integración nativa con la cámara del dispositivo usando `FileProvider` y `ActivityResultContracts` para adjuntar pruebas fotográficas.
+*   🗺️ **Geolocalización Nativa:** Integración con Google Maps SDK y Location Services (GPS) para indicar y visualizar el punto exacto de la incidencia, ordenando el listado por cercanía.
+*   💬 **Chat de Soporte en Tiempo Real:** Implementación de una sala de chat grupal técnica usando conexiones de sockets TCP puras en **Java (Clases Socket/ServerSocket)**, demostrando control de red de bajo nivel.
+*   🎨 **Diseño Material:** Interfaz limpia, minimalista e intuitiva respetando las guías de Material Design de Google (Edge-to-Edge, Componentes MUI).
 
-### 🔐 Gestión de Identidad
+---
 
-* Registro e inicio de sesión seguro de usuarios.
+## 🛠️ Stack Tecnológico y Arquitectura
 
-### 📝 Reporte de Incidencias
+El proyecto abarca tecnologías modernas de desarrollo Android y servicios BaaS, y cumple con los currículos de las asignaturas técnicas del ciclo formativo:
 
-* Creación de alertas con:
+| Categoría | Tecnologías Utilizadas |
+| :--- | :--- |
+| **Desarrollo Móvil (PMDM / DI)** | `Java`, `Android SDK`, `Material Design Components`, `Activity Result API` |
+| **Acceso a Datos (AD)** | `SQLiteOpenHelper`, `Cursor`, Listas en Memoria, `ContentValues` |
+| **Servicios en la Nube** | `Firebase Authentication`, `Cloud Firestore (NoSQL)` |
+| **Servicios y Procesos (PSP)** | `Threads / Runnables`, `Concurrencia GUI (runOnUiThread)`, Sockets TCP |
+| **Sensores y APIs Externas** | `Google Maps API`, `Fused Location Provider`, Cámara |
 
-  * 🏷️ Título
-  * 📄 Descripción
-  * 🚨 Nivel de urgencia
-  * 📷 Evidencia multimedia (foto / audio)
-  * 📍 Ubicación GPS
+### 🏗️ Sincronización (Offline-First)
 
-### 🔄 Sincronización Inteligente
-
-* Funcionamiento **offline** con sincronización diferida automática.
-
-### 🛠️ Soporte Técnico
-
-* Canal de comunicación directa mediante **Sockets TCP/IP**.
+El núcleo técnico de EcoCity es su robustez frente a pérdidas de conexión, diseñada bajo un patrón DAO híbrido:
+1. **Capa Local (Fuente de la Verdad):** Toda operación (CRUD) se persiste inmediatamente contra la base de datos `SQLite` local con *Optimistic UI Updates*.
+2. **Capa de Sincronización:** Una bandera (`is_synced`) marca el estado del registro. El `NetworkMonitor` "escucha" los cambios del sistema usando `NetworkCallback`.
+3. **Capa Cloud (Respaldo):** Al recuperar red, un hilo secundario vuelca silenciosamente los registros locales pendientes hacia `Firestore`.
 
 ---
 
 ## 🗂️ Estructura del Proyecto
 
-El proyecto sigue el patrón de arquitectura **MVC (Model–View–Controller)**, separando claramente responsabilidades:
+El proyecto sigue el patrón de arquitectura **MVC (Model–View–Controller)**:
 
 ```text
 EcoCity/
@@ -66,20 +80,12 @@ EcoCity/
 │   │   ├── main/
 │   │       ├── java/com/ecocity/
 │   │       │   ├── controller/                        # Lógica de negocio y comunicación
-│   │       │   │   ├── LoginController.java
-│   │       │   │   └── IncidentController.java
-│   │       │   ├── model/                             # Datos y Base de Datos (SQLite)
-│   │       │   │   ├── Incident.java
-│   │       │   │   ├── User.java
-│   │       │   │   └── DatabaseHelper.java
-│   │       │   ├── view/                              # Interfaz de Usuario (Activities)
-│   │       │   │   ├── LoginActivity.java
-│   │       │   │   ├── IncidentListActivity.java
-│   │       │   │   ├── CreateIncidentActivity.java
-│   │       │   │   └── adapter/                       # Adaptadores para RecyclerView
-│   │       │   │       └── IncidentAdapter.java
+│   │       │   ├── database/                          # SQLite (DAO, DbHelper)
+│   │       │   ├── model/                             # Datos (Incidencia, Usuario)
+│   │       │   ├── ui/                                # Interfaz de Usuario (Activities, Adapters)
+│   │       │   └── utils/                             # Utilidades (NetworkMonitor, SessionManager)
 │   │       ├── res/
-│   │           ├── layout/                            # Diseños XML
+│   │           ├── layout/                            # Diseños XML (Material Design)
 │   │           └── values/
 ├── build.gradle
 └── README.md
@@ -87,45 +93,22 @@ EcoCity/
 
 ---
 
-## ✅ Estado del Proyecto – Hito 1
+## 🚀 Instalación y Ejecución
 
-🎯 **Hito 1 completado con éxito**. Este primer hito se ha centrado en la **experiencia de usuario** y la **persistencia local de datos**.
+Para desplegar este proyecto en tu entorno local:
 
-### 🎨 Interfaz de Usuario (UI/UX)
-
-* 🔑 **Pantalla de Login**
-
-  * Diseño visual limpio
-  * Validación de credenciales
-
-* 📋 **Listado de Incidencias**
-
-  * Uso de `RecyclerView`
-  * Tarjetas personalizadas por incidencia
-
-* ➕ **Formulario de Alta**
-
-  * Creación de nuevas incidencias
-  * Validación de entradas de usuario
-
-### 💾 Persistencia de Datos (Offline)
-
-* 🗄️ Base de datos **SQLite** integrada
-* 🔄 **CRUD completo**:
-
-  * ➕ Crear incidencias
-  * 👀 Leer incidencias almacenadas
-  * ✏️ Editar incidencias existentes
-  * 🗑️ Eliminar incidencias
-
----
-
-## 🔮 Próximos Pasos
-
-📍 **Roadmap del proyecto**:
-
-* 🧭 **Hito 2**: Integración de multimedia (📷 Cámara, 🎤 Audio) y sensores (📍 GPS).
-* ☁️ **Hito 3**: Sincronización con la nube (Firebase) y comunicación mediante **Sockets TCP**.
+1.  **Clonar el repositorio:**
+    ```bash
+    git clone https://ruta-a-tu-repositorio/PI_EcoCity.git
+    cd PI_EcoCity
+    ```
+2.  **Configurar credenciales (Requisito indispensable):**
+    - Añadir el archivo generado de configuración de Firebase `google-services.json` dentro del directorio `app/`.
+    - Registrar tu clave de API de **Google Maps** (`MAPS_API_KEY`) en el archivo `local.properties`.
+3.  **Construir con Gradle:**
+    Abre el proyecto en **Android Studio**, deja que Gradle sincronice las dependencias y ejecuta `assembleDebug` para compilar el APK.
+4.  **Correr el Servidor de Chat (Requisito para el Chat TCP):**
+    Debes levantar el script servidor Java de Sockets (puerto 5000) de manera paralela si deseas testear el módulo TCP de soporte.
 
 ---
 
@@ -141,7 +124,7 @@ EcoCity/
 [![GitHub](https://img.shields.io/badge/GitHub-gabiisnchez-181717?style=for-the-badge&logo=github)](https://github.com/gabiisnchez)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Gabriel_Sánchez_Heredia-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/gabrielsanher/)
 
-
+---
 
 ## 📧 Contacto
 
@@ -162,5 +145,3 @@ Para preguntas o sugerencias sobre el proyecto:
 **Desarrollado con ❤️ como proyecto de PSP, PMDM y DI.**
 
 </div>
-
-

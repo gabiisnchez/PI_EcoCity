@@ -60,6 +60,9 @@ public class MainActivity extends AppCompatActivity {
     private android.location.Location userLocation;
     private ChipGroup chipGroupSort;
 
+    // Monitorización de Red para Sincronización Offline-First
+    private com.ecocity.app.utils.NetworkMonitor networkMonitor;
+
     /**
      * Inicialización de la Actividad.
      */
@@ -130,6 +133,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        // Iniciar Monitorización de Red (Offline-First Sync)
+        networkMonitor = new com.ecocity.app.utils.NetworkMonitor(this);
+        networkMonitor.startMonitoring();
     }
 
     /**
@@ -219,7 +226,8 @@ public class MainActivity extends AppCompatActivity {
                         userLocation = location;
                         sortListByProximity();
                     } else {
-                        android.widget.Toast.makeText(this, "No se pudo obtener la ubicación actual", android.widget.Toast.LENGTH_SHORT).show();
+                        android.widget.Toast.makeText(this, "No se pudo obtener la ubicación actual",
+                                android.widget.Toast.LENGTH_SHORT).show();
                         // Volver a selección "Urgencia" visualmente si falla
                         chipGroupSort.check(R.id.chipUrgency);
                     }
@@ -227,23 +235,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sortListByProximity() {
-        if (currentList == null || userLocation == null) return;
-        
+        if (currentList == null || userLocation == null)
+            return;
+
         Collections.sort(currentList, new Comparator<Incidencia>() {
             @Override
             public int compare(Incidencia o1, Incidencia o2) {
                 float[] results1 = new float[1];
                 float[] results2 = new float[1];
-                
-                android.location.Location.distanceBetween(userLocation.getLatitude(), userLocation.getLongitude(), 
+
+                android.location.Location.distanceBetween(userLocation.getLatitude(), userLocation.getLongitude(),
                         o1.getLatitud(), o1.getLongitud(), results1);
-                android.location.Location.distanceBetween(userLocation.getLatitude(), userLocation.getLongitude(), 
+                android.location.Location.distanceBetween(userLocation.getLatitude(), userLocation.getLongitude(),
                         o2.getLatitud(), o2.getLongitud(), results2);
-                
+
                 return Float.compare(results1[0], results2[0]);
             }
         });
-        
+
         if (adapter != null) {
             adapter.updateData(currentList);
             // Hacer scroll al inicio
@@ -252,28 +261,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sortListByUrgency() {
-         if (currentList != null && adapter != null) {
-             Collections.sort(currentList, new Comparator<Incidencia>() {
-                 @Override
-                 public int compare(Incidencia o1, Incidencia o2) {
-                     int p1 = getUrgencyPriority(o1.getUrgencia());
-                     int p2 = getUrgencyPriority(o2.getUrgencia());
-                     return Integer.compare(p1, p2);
-                 }
-                 
-                 private int getUrgencyPriority(String urgencia) {
-                     if (urgencia == null) return 4;
-                     switch (urgencia.toLowerCase()) {
-                         case "alta": return 1;
-                         case "media": return 2;
-                         case "baja": return 3;
-                         default: return 4;
-                     }
-                 }
-             });
-             adapter.updateData(currentList);
-             recyclerView.scrollToPosition(0);
-         }
+        if (currentList != null && adapter != null) {
+            Collections.sort(currentList, new Comparator<Incidencia>() {
+                @Override
+                public int compare(Incidencia o1, Incidencia o2) {
+                    int p1 = getUrgencyPriority(o1.getUrgencia());
+                    int p2 = getUrgencyPriority(o2.getUrgencia());
+                    return Integer.compare(p1, p2);
+                }
+
+                private int getUrgencyPriority(String urgencia) {
+                    if (urgencia == null)
+                        return 4;
+                    switch (urgencia.toLowerCase()) {
+                        case "alta":
+                            return 1;
+                        case "media":
+                            return 2;
+                        case "baja":
+                            return 3;
+                        default:
+                            return 4;
+                    }
+                }
+            });
+            adapter.updateData(currentList);
+            recyclerView.scrollToPosition(0);
+        }
     }
 
     // Launcher para permisos de ubicación
@@ -283,7 +297,8 @@ public class MainActivity extends AppCompatActivity {
                 if (isGranted) {
                     getUserLocationAndSort();
                 } else {
-                    android.widget.Toast.makeText(this, "Permiso de ubicación necesario para ordenar por cercanía", android.widget.Toast.LENGTH_LONG).show();
+                    android.widget.Toast.makeText(this, "Permiso de ubicación necesario para ordenar por cercanía",
+                            android.widget.Toast.LENGTH_LONG).show();
                     chipGroupSort.check(R.id.chipUrgency);
                 }
             });
@@ -296,5 +311,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         incidenciaDAO.close();
+        if (networkMonitor != null) {
+            networkMonitor.stopMonitoring();
+        }
     }
 }

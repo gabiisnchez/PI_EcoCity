@@ -37,6 +37,14 @@ public class Incidencia implements Serializable {
     // Email del usuario que reportó la incidencia
     private String userEmail;
 
+    // --- Campos de Sincronización Local (SQLite) ---
+    // ID autonumérico local
+    private long localId = -1;
+    // Bandera para saber si ya se subió a Firestore
+    private int isSynced = 0; // 0 = pendiente, 1 = sincronizado
+    // Acción pendiente de sincronizar: INSERT, UPDATE, DELETE
+    private String syncAction = "INSERT";
+
     /**
      * Constructor vacío requerido para Firestore.
      */
@@ -136,5 +144,29 @@ public class Incidencia implements Serializable {
 
     public void setUserEmail(String userEmail) {
         this.userEmail = userEmail;
+    }
+
+    public long getLocalId() {
+        return localId;
+    }
+
+    public void setLocalId(long localId) {
+        this.localId = localId;
+    }
+
+    public int getIsSynced() {
+        return isSynced;
+    }
+
+    public void setIsSynced(int isSynced) {
+        this.isSynced = isSynced;
+    }
+
+    public String getSyncAction() {
+        return syncAction;
+    }
+
+    public void setSyncAction(String syncAction) {
+        this.syncAction = syncAction;
     }
 }

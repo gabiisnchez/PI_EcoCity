@@ -21,11 +21,12 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "EcoCity.db";
     // Versión de la base de datos. Incrementar este número si se cambia el esquema
     // (tablas/columnas).
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     // --- Definición de Tabla Incidencias ---
     public static final String TABLE_INCIDENCIAS = "incidencias";
-    public static final String COLUMN_ID = "id";
+    public static final String COLUMN_LOCAL_ID = "local_id";
+    public static final String COLUMN_FIRESTORE_ID = "firestore_id";
     public static final String COLUMN_TITULO = "titulo";
     public static final String COLUMN_DESCRIPCION = "descripcion";
     public static final String COLUMN_URGENCIA = "urgencia";
@@ -34,6 +35,8 @@ public class DbHelper extends SQLiteOpenHelper {
     public static final String COLUMN_LATITUD = "latitud";
     public static final String COLUMN_LONGITUD = "longitud";
     public static final String COLUMN_USER_EMAIL = "user_email"; // Clave foránea lógica (Email del usuario)
+    public static final String COLUMN_IS_SYNCED = "is_synced"; // 0 o 1
+    public static final String COLUMN_SYNC_ACTION = "sync_action"; // INSERT, UPDATE, DELETE
 
     // --- Definición de Tabla Usuarios ---
     public static final String TABLE_USERS = "users";
@@ -46,7 +49,8 @@ public class DbHelper extends SQLiteOpenHelper {
 
     // SQL para crear la tabla de incidencias
     private static final String TABLE_CREATE_INCIDENCIAS = "CREATE TABLE " + TABLE_INCIDENCIAS + " (" +
-            COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            COLUMN_LOCAL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            COLUMN_FIRESTORE_ID + " TEXT, " +
             COLUMN_TITULO + " TEXT, " +
             COLUMN_DESCRIPCION + " TEXT, " +
             COLUMN_URGENCIA + " TEXT, " +
@@ -54,7 +58,9 @@ public class DbHelper extends SQLiteOpenHelper {
             COLUMN_ESTADO + " TEXT, " +
             COLUMN_LATITUD + " REAL, " +
             COLUMN_LONGITUD + " REAL, " +
-            COLUMN_USER_EMAIL + " TEXT" +
+            COLUMN_USER_EMAIL + " TEXT, " +
+            COLUMN_IS_SYNCED + " INTEGER DEFAULT 0, " +
+            COLUMN_SYNC_ACTION + " TEXT DEFAULT 'INSERT'" +
             ");";
 
     // SQL para crear la tabla de usuarios

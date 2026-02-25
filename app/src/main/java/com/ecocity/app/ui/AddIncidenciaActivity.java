@@ -75,7 +75,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
 
     // TextView para mostrar coordenadas o estado de la ubicación
     private android.widget.TextView tvLocationStatusDetail;
-    
+
     // Título de la cabecera
     private android.widget.TextView tvHeader;
 
@@ -277,7 +277,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
                         tvLocationStatusDetail.setText(String.format(getString(R.string.text_location_registered),
                                 String.format("%.4f", currentLat), String.format("%.4f", currentLng)));
                         tvLocationStatusDetail.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
-                        
+
                         // Mostrar visualmente en mapa
                         setupLocationPreview();
                     }
@@ -397,18 +397,20 @@ public class AddIncidenciaActivity extends AppCompatActivity {
      */
     private void setupLocationPreview() {
         android.widget.FrameLayout mapContainer = findViewById(R.id.mapContainer);
-        if (mapContainer == null) return;
+        if (mapContainer == null)
+            return;
 
         if (currentLat != 0.0 || currentLng != 0.0) {
             mapContainer.setVisibility(View.VISIBLE);
-            
+
             if (mapView == null) {
                 try {
-                    com.google.android.gms.maps.GoogleMapOptions options = new com.google.android.gms.maps.GoogleMapOptions().liteMode(true);
+                    com.google.android.gms.maps.GoogleMapOptions options = new com.google.android.gms.maps.GoogleMapOptions()
+                            .liteMode(true);
                     mapView = new com.google.android.gms.maps.MapView(this, options);
                     mapContainer.addView(mapView);
                     mapView.onCreate(null);
-                    mapView.onResume(); 
+                    mapView.onResume();
                 } catch (Exception e) {
                     e.printStackTrace();
                     return;
@@ -418,7 +420,8 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             mapView.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
-                    if (googleMap == null) return;
+                    if (googleMap == null)
+                        return;
                     LatLng location = new LatLng(currentLat, currentLng);
                     googleMap.clear();
                     googleMap.addMarker(new MarkerOptions().position(location));
@@ -484,7 +487,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             // Cambiar texto de botón para reflejar acción
             btnSave.setText(getString(R.string.btn_update));
             btnDelete.setVisibility(View.VISIBLE);
-            
+
             // Cambiar título de cabecera
             if (tvHeader != null) {
                 tvHeader.setText(getString(R.string.title_activity_edit_incidencia));
@@ -501,7 +504,7 @@ public class AddIncidenciaActivity extends AppCompatActivity {
             Toast.makeText(this, getString(R.string.msg_deleted), Toast.LENGTH_SHORT).show();
             finish();
 
-            incidenciaDAO.deleteIncidencia(incidenciaToEdit.getId(), new IncidenciaDAO.FirestoreCallback() {
+            incidenciaDAO.deleteIncidencia(incidenciaToEdit, new IncidenciaDAO.FirestoreCallback() {
                 @Override
                 public void onSuccess(String result) {
                     android.util.Log.d("AddIncidencia", "Incidencia eliminada: " + result);
@@ -619,18 +622,21 @@ public class AddIncidenciaActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (mapView != null) mapView.onResume();
+        if (mapView != null)
+            mapView.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (mapView != null) mapView.onPause();
+        if (mapView != null)
+            mapView.onPause();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        if (mapView != null) mapView.onLowMemory();
+        if (mapView != null)
+            mapView.onLowMemory();
     }
 }

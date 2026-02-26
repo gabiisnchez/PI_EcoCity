@@ -37,7 +37,7 @@
         <!-- Clave API de Google Maps -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDMpZ3nZMQSOaWo5zapeRvx07wsNn0Ui9I"/>
+            android:value="${MAPS_API_KEY}"/>
 
         <!-- Proveedor de Archivos para compartir fotos con la cámara -->
         <provider

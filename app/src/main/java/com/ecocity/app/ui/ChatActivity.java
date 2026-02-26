@@ -51,7 +51,7 @@ public class ChatActivity extends AppCompatActivity {
 
     // Configuración API Gemini
     private GeminiApiService geminiApiService;
-    private static final String GEMINI_API_KEY = "AIzaSyDBOrbO99Jue5dIEPYubiubxrP_ZwCQUDs";
+    private static final String GEMINI_API_KEY = com.ecocity.app.BuildConfig.GEMINI_API_KEY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
